@@ -472,8 +472,9 @@
         </div>
     </div>
 
+    <!-- 呼叫兼职按钮（样式修改：流光白背景、极光黄边框） -->
     <div class="flex items-center gap-4 flex-shrink-0">
-        <button onclick="openCallPartTimer()" class="px-4 py-2 rounded-xl text-white font-bold shadow-md hover:shadow-lg transition text-sm" style="background:var(--copper);">📣 一键呼叫外部兼职</button>
+        <button onclick="openCallPartTimer()" class="px-4 py-2 rounded-xl font-bold shadow-md hover:shadow-lg transition text-sm flex items-center justify-center" style="background:#fff; border:2px solid var(--yellow); color:#1a1a2e;">一键呼叫外部兼职</button>
     </div>
 
     <div class="flex items-center gap-4 flex-shrink-0">
@@ -481,7 +482,7 @@
             <span class="text-xs text-gray-500 block">今日实时营业额</span>
             <span class="text-2xl font-extrabold tracking-tight" style="color:var(--green);" id="todayRevenue">¥0</span>
         </div>
-        <button onclick="openSettings()" class="btn-action text-xs px-3 py-2 rounded-lg" title="系统设置">⚙️ 设置</button>
+        <!-- 设置按钮已移除 -->
         <button onclick="openChannelManager()" id="channelBtn" class="btn-action text-xs px-3 py-2 rounded-lg" title="客源渠道">📋 渠道</button>
         <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-500 underline">退出</button>
     </div>
@@ -518,52 +519,6 @@
     <main class="flex-1 flex gap-3 p-3 overflow-hidden" style="min-width:0;" id="trackContainer">
         <!-- 轨道由JS动态渲染 -->
     </main>
-</div>
-
-<!-- ==================== 设置弹窗 ==================== -->
-<div id="settingsModal" class="modal-overlay hidden" onclick="if(event.target===this)closeSettings(false)">
-    <div class="modal-box">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-bold">⚙️ 系统设置</h2>
-            <button onclick="closeSettings(false)" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
-        </div>
-        <div class="space-y-4 text-sm">
-            <div>
-                <label class="font-semibold block mb-1">选片模式</label>
-                <select id="selectionMode" class="w-full px-3 py-2 rounded-lg border text-sm" onchange="saveSettings()">
-                    <option value="inStore">🏪 店内选片模式（排队+计价）</option>
-                    <option value="remote">📱 离店自选模式（微信验证）</option>
-                </select>
-            </div>
-            <div class="grid grid-cols-3 gap-3">
-                <div>
-                    <label class="font-semibold block mb-1 text-xs">标准精修 ¥/张</label>
-                    <input type="number" id="priceStandard" value="40" class="w-full px-2 py-1.5 rounded-lg border text-sm" onchange="saveSettings()">
-                </div>
-                <div>
-                    <label class="font-semibold block mb-1 text-xs">超精修 ¥/张</label>
-                    <input type="number" id="pricePremium" value="60" class="w-full px-2 py-1.5 rounded-lg border text-sm" onchange="saveSettings()">
-                </div>
-                <div>
-                    <label class="font-semibold block mb-1 text-xs">商业精修 ¥/张</label>
-                    <input type="number" id="priceCommercial" value="100" class="w-full px-2 py-1.5 rounded-lg border text-sm" onchange="saveSettings()">
-                </div>
-            </div>
-            <div class="border-t pt-3 mt-3">
-                <p class="font-semibold text-sm mb-2">🔒 二消隐私护城河（兼职发布）</p>
-                <button onclick="alert('📢 发布兼职呼叫成功！\\n\\n睫毛美瞳提成：店员拿 X%（此数字仅定向解锁显示，公共大厅不可见）\\n\\n⚠️ 提成比例属商家机密，已加密存储。')"
-                class="btn-action btn-copper text-xs px-4 py-2">
-                📣 一键呼叫外部兼职
-            </button>
-            <p class="text-xs text-gray-400 mt-1">提成比例仅接单成功后定向显示</p>
-        </div>
-    </div>
-    <div class="flex justify-end mt-4 gap-2">
-        <button onclick="closeSettings(false)" class="px-4 py-2 rounded-lg border text-sm text-gray-600">取消</button>
-        <button onclick="closeSettings(true)" class="px-4 py-2 rounded-lg text-white font-bold text-sm"
-        style="background:var(--green);">保存</button>
-    </div>
-</div>
 </div>
 
 <!-- ==================== 渠道管理弹窗 ==================== -->
@@ -619,9 +574,25 @@
             <div>
                 <label class="font-semibold block mb-1">工种风格</label>
                 <select id="styleSelect" class="w-full px-3 py-2 rounded-lg border">
-                    <option>清新自然</option>
-                    <option>复古胶片</option>
-                    <option>时尚大片</option>
+                    <optgroup label="化妆造型">
+                        <option>傣族重工</option>
+                        <option>敦煌飞天</option>
+                        <option>苗族银饰</option>
+                        <option>大唐古风</option>
+                        <option>清宫旗头</option>
+                        <option>西域公主</option>
+                        <option>战国袍</option>
+                        <option>现代高奢</option>
+                    </optgroup>
+                    <optgroup label="摄影风格">
+                        <option>暮光夜景</option>
+                        <option>日系复古</option>
+                        <option>新中式国潮</option>
+                        <option>纪实情绪</option>
+                        <option>法式浪漫</option>
+                        <option>纪实旅拍</option>
+                        <option>高级大片</option>
+                    </optgroup>
                 </select>
             </div>
             <div class="flex items-center gap-3">
@@ -714,17 +685,6 @@
                 const tx = db.transaction(storeName, 'readwrite');
                 const store = tx.objectStore(storeName);
                 store.delete(id);
-                tx.oncomplete = () => resolve();
-                tx.onerror = (e) => reject(e.target.error);
-            });
-        }
-
-        function dbClear(storeName) {
-            return new Promise((resolve, reject) => {
-                if (!db) { reject('DB not ready'); return; }
-                const tx = db.transaction(storeName, 'readwrite');
-                const store = tx.objectStore(storeName);
-                store.clear();
                 tx.oncomplete = () => resolve();
                 tx.onerror = (e) => reject(e.target.error);
             });
@@ -960,6 +920,7 @@
             await dbPut('staff', s);
         }
 
+        // 保存设置（当从选片轨道头部控件更新时调用）
         async function saveSettings() {
             const settingsData = [
                 { key: 'selectionMode', value: appSettings.selectionMode },
@@ -1052,6 +1013,31 @@
                     sortedOrders.sort((a, b) => b.timestamp - a.timestamp);
                 }
                 const count = sortedOrders.length;
+
+                // 如果是选片轨道，头部需要额外集成设置面板
+                let extraHeaderContent = '';
+                if (track.key === 'selection') {
+                    extraHeaderContent = `
+                    <div class="mt-2 flex flex-wrap items-center justify-center gap-2 text-xs bg-gray-50 rounded-lg p-2 border border-gray-100">
+                        <select id="inlineSelectionMode" class="px-2 py-1 rounded border text-xs" onchange="updateSelectionMode(this.value)">
+                            <option value="inStore" ${appSettings.selectionMode === 'inStore' ? 'selected' : ''}>店内选片</option>
+                            <option value="remote" ${appSettings.selectionMode === 'remote' ? 'selected' : ''}>离店自选</option>
+                        </select>
+                        <div class="flex items-center gap-1">
+                            <label class="text-gray-500">标准</label>
+                            <input type="number" id="inlinePriceStandard" value="${appSettings.priceStandard}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updatePriceStandard(this.value)">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <label class="text-gray-500">超精</label>
+                            <input type="number" id="inlinePricePremium" value="${appSettings.pricePremium}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updatePricePremium(this.value)">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <label class="text-gray-500">商业</label>
+                            <input type="number" id="inlinePriceCommercial" value="${appSettings.priceCommercial}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updatePriceCommercial(this.value)">
+                        </div>
+                    </div>`;
+                }
+
                 html += `
                 <div class="track-column flex-1 min-w-[130px]"
                 data-track-id="${track.id}"
@@ -1064,6 +1050,7 @@
                     <span class="track-dot"></span>
                     <span class="font-bold text-xs text-gray-700">${track.icon} ${track.name}</span>
                     <span class="track-badge" id="badge-${track.id}">${count}</span>
+                    ${extraHeaderContent}
                 </div>
                 <div class="track-body" id="track-body-${track.id}">
                     ${sortedOrders.map(o => buildOrderCardHTML(o, track)).join('')}
@@ -1078,6 +1065,24 @@
             updateTrackDisabledStates();
         }
 
+        // 设置面板的值更新函数（挂载到window）
+        window.updateSelectionMode = function(mode) {
+            appSettings.selectionMode = mode;
+            saveSettings();
+        };
+        window.updatePriceStandard = function(val) {
+            appSettings.priceStandard = parseFloat(val) || 40;
+            saveSettings();
+        };
+        window.updatePricePremium = function(val) {
+            appSettings.pricePremium = parseFloat(val) || 60;
+            saveSettings();
+        };
+        window.updatePriceCommercial = function(val) {
+            appSettings.priceCommercial = parseFloat(val) || 100;
+            saveSettings();
+        };
+
         function buildOrderCardHTML(order, track) {
             let typeTagHTML = '';
             if (order.type === 'makeup_only') {
@@ -1091,11 +1096,9 @@
             let wechatHTML = '';
             if (track.key === 'selection' && appSettings.selectionMode === 'remote') {
                 if (order.wechatAdded) {
-                    wechatHTML =
-                        '<span class="text-green-500 text-xs font-bold cursor-pointer" title="已加微信">💚 已加微信</span>';
+                    wechatHTML = '<span class="text-green-500 text-xs font-bold cursor-pointer" title="已加微信">💚 已加微信</span>';
                 } else {
-                    wechatHTML =
-                        `<span class="text-gray-400 text-xs font-bold cursor-pointer line-through decoration-red-400" title="点击标记已加微信" onclick="event.stopPropagation();markWechatAdded('${order.id}')">🔘 未加微信</span>`;
+                    wechatHTML = `<span class="text-gray-400 text-xs font-bold cursor-pointer line-through decoration-red-400" title="点击标记已加微信" onclick="event.stopPropagation();markWechatAdded('${order.id}')">🔘 未加微信</span>`;
                 }
             }
 
@@ -1119,11 +1122,6 @@
             let priceCalcHTML = '';
             if (track.key === 'selection' && appSettings.selectionMode === 'inStore') {
                 const levelLabels = { standard: '标准精修', premium: '超精修', commercial: '商业精修' };
-                const levelPrices = {
-                    standard: appSettings.priceStandard,
-                    premium: appSettings.pricePremium,
-                    commercial: appSettings.priceCommercial
-                };
                 priceCalcHTML = `
                 <div class="price-calc" onclick="event.stopPropagation();">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -1144,14 +1142,12 @@
 
             let printBtnHTML = '';
             if (track.key === 'selection' || track.key === 'delivery') {
-                printBtnHTML =
-                    `<button class="btn-action btn-print text-xs px-2 py-1 mt-1" onclick="event.stopPropagation();printOrder('${order.id}')">🖨️ 打印单据</button>`;
+                printBtnHTML = `<button class="btn-action btn-print text-xs px-2 py-1 mt-1" onclick="event.stopPropagation();printOrder('${order.id}')">🖨️ 打印单据</button>`;
             }
 
             let skipBtnHTML = '';
             if (order.type === 'makeup_only' && track.key === 'styling') {
-                skipBtnHTML =
-                    `<button class="btn-action btn-green text-xs px-2 py-1 mt-1" onclick="event.stopPropagation();skipToDelivery('${order.id}')">⏭️ 跳过拍摄 → 结算</button>`;
+                skipBtnHTML = `<button class="btn-action btn-green text-xs px-2 py-1 mt-1" onclick="event.stopPropagation();skipToDelivery('${order.id}')">⏭️ 跳过拍摄 → 结算</button>`;
             }
 
             let overloadClass = '';
@@ -1367,7 +1363,7 @@
         }
     };
 
-    // ==================== 智能输入解析 ====================
+    // ==================== 智能输入解析（修复渠道识别） ====================
     window.handleQuickInput = function() {
         const input = document.getElementById('quickInput');
         const raw = input.value.trim();
@@ -1379,52 +1375,33 @@
     };
 
     function parseInput(raw) {
-        const phoneMatch = raw.match(/1[3-9]\d{9}/);
-        let phone = phoneMatch ? phoneMatch[0] : '';
-        let remaining = raw.replace(phone, '').trim();
+        // 按空格分割为词元
+        const tokens = raw.split(/\s+/).filter(Boolean);
+        if (tokens.length === 0) {
+            return { name: '匿名散客', phone: '', deposit: 0, channel: '散客' };
+        }
 
-        const amounts = remaining.match(/\d+/g);
+        // 最后一个词作为渠道
+        const channel = tokens.pop();
+
+        // 剩余部分中提取电话和定金
+        let phone = '';
         let deposit = 0;
-        if (amounts && amounts.length > 0) {
-            for (const am of amounts) {
-                const val = parseInt(am);
-                if (val > 0 && val < 100000 && am.length <= 6) {
-                    deposit = val;
-                    remaining = remaining.replace(am, '').trim();
-                    break;
-                }
+        const remainingTokens = [];
+
+        for (const token of tokens) {
+            if (!phone && /^1[3-9]\d{9}$/.test(token)) {
+                phone = token;
+            } else if (deposit === 0 && /^\d{1,6}$/.test(token) && parseInt(token) > 0) {
+                deposit = parseInt(token);
+            } else {
+                remainingTokens.push(token);
             }
         }
 
-        const parts = remaining.split(/\s+/).filter(Boolean);
-        let name = '匿名散客';
-        let channel = '散客';
-
-        if (parts.length === 0) {
-            name = '匿名散客';
-            channel = '散客';
-        } else if (parts.length === 1) {
-            const first = parts[0];
-            if (/^[\u4e00-\u9fa5]{2,4}$/.test(first) && !/美团|点评|小红书|抖音|导游|携程|飞猪|马蜂窝/i.test(first)) {
-                name = first;
-                channel = '散客';
-            } else {
-                name = '匿名散客';
-                channel = first;
-            }
-        } else {
-            const firstIsName = /^[\u4e00-\u9fa5]{2,4}$/.test(parts[0]) && !/美团|点评|小红书|抖音|导游|携程|飞猪|马蜂窝|淘宝|微信|支付宝/i
-                .test(parts[0]);
-            if (firstIsName) {
-                name = parts[0];
-                channel = parts.slice(1).join(' ') || '散客';
-            } else {
-                name = '匿名散客';
-                channel = parts.join(' ');
-            }
-        }
-
-        if (channel.length > 20) channel = channel.substring(0, 20);
+        // 剩余部分拼接为姓名
+        let name = remainingTokens.join('') || '匿名散客';
+        if (name.length > 10) name = name.substring(0, 10); // 防止过长
 
         return { name, phone, deposit, channel };
     }
@@ -1589,26 +1566,6 @@
         }
     };
 
-    // ==================== 设置弹窗交互 ====================
-    window.openSettings = function() {
-        document.getElementById('selectionMode').value = appSettings.selectionMode;
-        document.getElementById('priceStandard').value = appSettings.priceStandard;
-        document.getElementById('pricePremium').value = appSettings.pricePremium;
-        document.getElementById('priceCommercial').value = appSettings.priceCommercial;
-        document.getElementById('settingsModal').classList.remove('hidden');
-    };
-
-    window.closeSettings = function(save) {
-        if (save) {
-            appSettings.selectionMode = document.getElementById('selectionMode').value;
-            appSettings.priceStandard = parseFloat(document.getElementById('priceStandard').value) || 40;
-            appSettings.pricePremium = parseFloat(document.getElementById('pricePremium').value) || 60;
-            appSettings.priceCommercial = parseFloat(document.getElementById('priceCommercial').value) || 100;
-            saveSettings();
-        }
-        document.getElementById('settingsModal').classList.add('hidden');
-    };
-
     // ==================== 渠道弹窗 ====================
     window.openChannelManager = function() {
         const today = new Date().toISOString().split('T')[0];
@@ -1741,7 +1698,6 @@
             renderAll();
         }
         document.getElementById('quickInput').focus();
-        console.log('✅ 旅拍档期派·商家控制台 初始化完成');
     }
 
     init().catch(err => {
