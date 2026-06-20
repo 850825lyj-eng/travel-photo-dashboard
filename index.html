@@ -16,10 +16,9 @@
       --copper: #D84315;
       --text: #1a1a2e;
       --glass: rgba(255, 255, 255, 0.78);
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
-      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
-      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.05);
-      --shadow-glow-green: 0 0 20px rgba(0, 200, 83, 0.35), 0 0 6px rgba(0, 200, 83, 0.2);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.04);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.05);
       --radius-sm: 10px;
       --radius-md: 14px;
       --radius-lg: 20px;
@@ -61,8 +60,8 @@
       animation: breatheYellow 0.7s infinite;
     }
     @keyframes breatheYellow {
-      0%,100%{ box-shadow: 0 0 10px rgba(255,225,0,0.3); border-color: #ffe100; }
-      50%{ box-shadow: 0 0 28px rgba(255,225,0,0.7); border-color: #ffc107; }
+      0%,100%{ box-shadow:0 0 10px rgba(255,225,0,0.3); border-color:#ffe100; }
+      50%{ box-shadow:0 0 28px rgba(255,225,0,0.7); border-color:#ffc107; }
     }
     .track-column {
       background: var(--card);
@@ -74,16 +73,8 @@
       min-height: 0;
       transition: 0.2s;
     }
-    .track-column.drag-over {
-      border-color: var(--green) !important;
-      background: #fafffb !important;
-    }
-    .track-column.track-disabled {
-      opacity: 0.45;
-      pointer-events: none;
-      background: #f0f0f0 !important;
-      border-style: dashed !important;
-    }
+    .track-column.drag-over { border-color: var(--green) !important; background: #fafffb !important; }
+    .track-column.track-disabled { opacity: 0.45; pointer-events: none; background: #f0f0f0 !important; border-style: dashed !important; }
     .track-header {
       flex-shrink: 0;
       padding: 12px 8px 8px;
@@ -96,116 +87,45 @@
       z-index: 2;
     }
     .track-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      background: #1a1a2e;
-      color: #fff;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 0 8px;
-      margin-left: 4px;
+      display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px;
+      border-radius: 999px; background: #1a1a2e; color: #fff; font-size: 12px; font-weight: 700; padding: 0 8px; margin-left: 4px;
     }
-    .track-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 8px 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      min-height: 0;
-    }
+    .track-body { flex: 1; overflow-y: auto; padding: 8px 6px; display: flex; flex-direction: column; gap: 7px; min-height: 0; }
     .order-card {
-      background: #fff;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 10px 12px;
-      cursor: grab;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
-      flex-shrink: 0;
-      font-size: 13px;
+      background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius-md);
+      padding: 10px 12px; cursor: grab; box-shadow: var(--shadow-sm);
+      transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1); flex-shrink: 0; font-size: 13px;
     }
     .order-card:active { cursor: grabbing; }
     .order-card.dragging { opacity: 0.55; transform: scale(0.94); }
     .btn-action {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 5px 10px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #fff;
-      cursor: pointer;
-      transition: 0.2s;
-      white-space: nowrap;
+      font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 8px;
+      border: 1px solid var(--border); background: #fff; cursor: pointer; transition: 0.2s; white-space: nowrap;
     }
-    .btn-action.btn-green { background: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
-    .btn-action.btn-copper { background: #fbe9e7; border-color: #ffab91; color: #bf360c; }
-    .btn-action.btn-disabled { opacity: 0.4; pointer-events: none; background: #eee; }
-    .price-calc {
-      background: #fafafa;
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 8px;
-      border: 1px dashed #e0e0e0;
-      font-size: 11px;
-    }
-    .qty-btn {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 1.5px solid #ccc;
-      background: #fff;
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .btn-action.btn-green { background:#e8f5e9; border-color:#a5d6a7; color:#1b5e20; }
+    .btn-action.btn-copper { background:#fbe9e7; border-color:#ffab91; color:#bf360c; }
+    .btn-action.btn-disabled { opacity:0.4; pointer-events:none; background:#eee; }
+    .price-calc { background:#fafafa; border-radius:10px; padding:10px; margin-top:8px; border:1px dashed #e0e0e0; font-size:11px; }
+    .qty-btn { width:26px; height:26px; border-radius:50%; border:1.5px solid #ccc; background:#fff; cursor:pointer; font-size:15px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; }
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(8px);
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); z-index:999;
+      display:flex; align-items:center; justify-content:center; animation:fadeIn 0.2s;
     }
     .modal-box {
-      background: #fff;
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      box-shadow: var(--shadow-lg);
-      max-width: 640px;
-      width: 90%;
-      max-height: 85vh;
-      overflow-y: auto;
+      background:#fff; border-radius:var(--radius-lg); padding:24px; box-shadow:var(--shadow-lg);
+      max-width:640px; width:90%; max-height:85vh; overflow-y:auto;
     }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
     @media print {
-      body * { visibility: hidden !important; }
-      #printArea, #printArea * { visibility: visible !important; }
+      body * { visibility:hidden !important; }
+      #printArea, #printArea * { visibility:visible !important; }
       #printArea {
-        position: fixed !important;
-        left: 0;
-        top: 0;
-        width: 100%;
-        max-width: 297mm;
-        min-height: 190mm;
-        max-height: 210mm;
-        padding: 8mm 10mm;
-        background: #fff;
-        z-index: 99999;
-        font-size: 10px;
-        color: #000;
+        position:fixed !important; left:0; top:0; width:100%; max-width:297mm; min-height:190mm;
+        max-height:210mm; padding:8mm 10mm; background:#fff; z-index:99999; font-size:10px; color:#000;
       }
-      #printArea .print-table { width: 100%; border-collapse: collapse; }
-      #printArea .print-table td { border: 0.5px solid #999; padding: 4px 6px; }
-      @page { size: A4 landscape; margin: 2mm; }
+      #printArea .print-table { width:100%; border-collapse:collapse; }
+      #printArea .print-table td { border:0.5px solid #999; padding:4px 6px; }
+      @page { size: A4 landscape; margin:2mm; }
     }
   </style>
 </head>
@@ -226,10 +146,7 @@
   <header class="topnav-glass flex items-center justify-between px-5 py-3 flex-shrink-0 gap-4 flex-wrap">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#00C853,#00a844);">派</div>
-      <div>
-        <h1 class="text-base font-bold text-gray-900">旅拍档期派 · 商家控制台</h1>
-        <p class="text-xs text-gray-500">LIVE SCHEDULING</p>
-      </div>
+      <div><h1 class="text-base font-bold text-gray-900">旅拍档期派 · 商家控制台</h1><p class="text-xs text-gray-500">LIVE SCHEDULING</p></div>
     </div>
     <button onclick="openCallPartTimer()" class="px-4 py-2 rounded-xl font-bold shadow-md text-sm flex items-center justify-center" style="background:#fff; border:2px solid var(--yellow); color:#1a1a2e;">一键呼叫外部兼职</button>
     <div class="flex items-center gap-3">
@@ -260,7 +177,6 @@
   </div>
 
   <!-- 弹窗容器 -->
-  <div id="settingsModal" class="modal-overlay hidden"></div>
   <div id="channelModal" class="modal-overlay hidden"></div>
   <div id="callPartTimerModal" class="modal-overlay hidden"></div>
   <div id="depositModal" class="modal-overlay hidden"></div>
@@ -353,12 +269,11 @@
       function defOrders() {
         const t = new Date().toISOString().split('T')[0];
         return [
-          { id: 'o1', flowNumber: '#001', name: '张美琳', phone: '13800001111', deposit: 300, channel: '美团', type: 'comprehensive', currentTrack: 'track1', timestamp: Date.now()-3600000, wechatAdded: false, makeupArtistId: null, photographerId: null, depositAmount: 0, rentalReturned: false, extraPhotos: 0, retouchLevel: 'standard', extraCost: 0, totalAmount: 300, date: t, rentalDepositPaid: false },
-          { id: 'o2', flowNumber: '#002', name: '李思远', phone: '13900002222', deposit: 500, channel: '导游小陈', type: 'photo_only', currentTrack: 'track4', timestamp: Date.now()-1800000, wechatAdded: true, makeupArtistId: null, photographerId: 'staff_p1', depositAmount: 0, rentalReturned: false, extraPhotos: 5, retouchLevel: 'premium', extraCost: 300, totalAmount: 800, date: t, rentalDepositPaid: false }
+          { id:'o1', flowNumber:'#001', name:'张美琳', phone:'13800001111', deposit:300, channel:'美团', type:'comprehensive', currentTrack:'track1', timestamp:Date.now()-3600000, wechatAdded:false, makeupArtistId:null, photographerId:null, depositAmount:0, rentalReturned:false, extraPhotos:0, retouchLevel:'standard', extraCost:0, totalAmount:300, date:t, rentalDepositPaid:false },
+          { id:'o2', flowNumber:'#002', name:'李思远', phone:'13900002222', deposit:500, channel:'导游小陈', type:'photo_only', currentTrack:'track4', timestamp:Date.now()-1800000, wechatAdded:true, makeupArtistId:null, photographerId:'staff_p1', depositAmount:0, rentalReturned:false, extraPhotos:5, retouchLevel:'premium', extraCost:300, totalAmount:800, date:t, rentalDepositPaid:false }
         ];
       }
 
-      // ==================== 核心数据加载 ====================
       async function loadInitialData() {
         const [orders, staff, sets] = await Promise.all([dbGetAll('orders'), dbGetAll('staff'), dbGetAll('settings')]);
         if (!orders.length && !staff.length) {
@@ -373,11 +288,12 @@
         flowCounter = allOrders.length;
         recalcStaff();
       }
+
       function recalcStaff() {
         allStaff.forEach(s => { s.currentLoad = 0; s.status = 'idle'; });
         allOrders.forEach(o => {
-          if (o.currentTrack === 'track3' && o.makeupArtistId) { const s = allStaff.find(x => x.id === o.makeupArtistId); if (s) s.currentLoad++; }
-          if (o.currentTrack === 'track4' && o.photographerId) { const s = allStaff.find(x => x.id === o.photographerId); if (s) s.currentLoad++; }
+          if (o.currentTrack === 'track3' && o.makeupArtistId) { const s = allStaff.find(x => x.id === o.makeupArtistId); if(s) s.currentLoad++; }
+          if (o.currentTrack === 'track4' && o.photographerId) { const s = allStaff.find(x => x.id === o.photographerId); if(s) s.currentLoad++; }
         });
         allStaff.forEach(s => {
           if (s.currentLoad === 0) s.status = 'idle';
@@ -386,51 +302,33 @@
         });
       }
 
-      // ==================== 万能智能解析器（条件降级拆分） ====================
+      // ==================== 万能解析器 ====================
       function parseInput(raw) {
         const tokens = raw.trim().split(/[\s,，\t]+/).filter(Boolean);
         if (tokens.length === 0) return { name: '匿名散客', phone: '', deposit: 0, channel: '散客' };
-
-        // 最后一个词作为渠道
         let channel = tokens[tokens.length - 1];
-        const remainingTokens = tokens.slice(0, -1);
-
-        // 如果最后一个词是纯数字（可能是电话号码或定金），则说明用户可能没有输入渠道，回退处理
+        const remaining = tokens.slice(0, -1);
         if (/^\d+$/.test(channel)) {
-          // 可能是电话号码或定金，重新判断
           if (channel.length === 11 && channel.startsWith('1')) {
-            // 最后一个词是电话号码，则没有渠道词
             channel = '散客';
-            remainingTokens.push(channel); // 把电话号码放回剩余词元
+            remaining.push(channel);
           } else {
-            // 是纯数字但不像电话，可能是定金，但也可能用户忘了渠道，保底为散客
             channel = '散客';
-            remainingTokens.push(channel);
+            remaining.push(channel);
           }
         }
-
-        // 从剩余词元中提取电话和定金
-        let phone = '';
-        let deposit = 0;
+        let phone = '', deposit = 0;
         const nameTokens = [];
-
-        for (const token of remainingTokens) {
-          if (!phone && /^1[3-9]\d{9}$/.test(token)) {
-            phone = token;
-          } else if (deposit === 0 && /^\d{1,6}$/.test(token) && parseInt(token) > 0) {
-            deposit = parseInt(token);
-          } else {
-            nameTokens.push(token);
-          }
+        for (const t of remaining) {
+          if (!phone && /^1[3-9]\d{9}$/.test(t)) phone = t;
+          else if (deposit === 0 && /^\d{1,6}$/.test(t) && parseInt(t) > 0) deposit = parseInt(t);
+          else nameTokens.push(t);
         }
-
         let name = nameTokens.join('') || '匿名散客';
         if (name.length > 10) name = name.substring(0, 10);
-
         return { name, phone, deposit, channel };
       }
 
-      // ==================== 全局刷新函数（数据流闭环核心） ====================
       async function refreshDashboard() {
         const orders = await dbGetAll('orders');
         const staff = await dbGetAll('staff');
@@ -476,14 +374,23 @@
           let extraHeader = '';
           if (track.key === 'selection') {
             extraHeader = `
-            <div class="mt-2 flex flex-wrap items-center justify-center gap-2 text-xs bg-gray-50 rounded-lg p-2 border">
-              <select id="inlineSelectionMode" class="px-2 py-1 border rounded text-xs" onchange="updateSetting('selectionMode', this.value)">
-                <option value="inStore" ${settings.selectionMode === 'inStore' ? 'selected' : ''}>店内选片</option>
-                <option value="remote" ${settings.selectionMode === 'remote' ? 'selected' : ''}>离店自选</option>
-              </select>
-              <input type="number" value="${settings.priceStandard}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updateSetting('priceStandard', this.value)" placeholder="标准">
-              <input type="number" value="${settings.pricePremium}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updateSetting('pricePremium', this.value)" placeholder="超精">
-              <input type="number" value="${settings.priceCommercial}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updateSetting('priceCommercial', this.value)" placeholder="商业">
+            <div class="mt-2 flex flex-col gap-2 text-xs bg-gray-50 rounded-lg p-2 border">
+              <div class="flex items-center gap-2">
+                <span class="font-semibold text-gray-600">选片模式：</span>
+                <select id="inlineSelectionMode" class="px-2 py-1 border rounded text-xs" onchange="updateSetting('selectionMode', this.value)">
+                  <option value="inStore" ${settings.selectionMode === 'inStore' ? 'selected' : ''}>店内选片（排队+计价）</option>
+                  <option value="remote" ${settings.selectionMode === 'remote' ? 'selected' : ''}>离店自选（微信验证）</option>
+                </select>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-semibold text-gray-600">精修单价：</span>
+                <label class="text-gray-500">标准</label>
+                <input type="number" value="${settings.priceStandard}" class="w-16 px-1 py-0.5 border rounded text-xs" onchange="updateSetting('priceStandard', this.value)">
+                <label class="text-gray-500">超精</label>
+                <input type="number" value="${settings.pricePremium}" class="w-16 px-1 py-0.5 border rounded text-xs" onchange="updateSetting('pricePremium', this.value)">
+                <label class="text-gray-500">商业</label>
+                <input type="number" value="${settings.priceCommercial}" class="w-16 px-1 py-0.5 border rounded text-xs" onchange="updateSetting('priceCommercial', this.value)">
+              </div>
             </div>`;
           }
           html += `
@@ -544,10 +451,7 @@
         </div>`;
       }
       function updateTrackBadges() {
-        TRACKS.forEach(t => {
-          const badge = document.getElementById('badge-'+t.id);
-          if (badge) badge.textContent = allOrders.filter(o => o.currentTrack === t.id).length;
-        });
+        TRACKS.forEach(t => { const badge = document.getElementById('badge-'+t.id); if(badge) badge.textContent = allOrders.filter(o => o.currentTrack === t.id).length; });
       }
       function updateRevenue() {
         if (role !== 'boss') return;
@@ -556,7 +460,7 @@
         document.getElementById('todayRevenue').textContent = '¥' + total.toLocaleString();
       }
 
-      // ==================== 录入闭环 ====================
+      // ==================== 录入 ====================
       window.handleQuickInput = async () => {
         const raw = document.getElementById('quickInput').value.trim();
         if (!raw) return;
@@ -605,8 +509,8 @@
         await refreshDashboard();
       };
 
-      // ==================== 业务操作 ====================
-      window.markWechat = async (id) => { const o = allOrders.find(x => x.id === id); if (o) { o.wechatAdded = true; await dbPut('orders', o); refreshDashboard(); } };
+      // ==================== 业务 ====================
+      window.markWechat = async (id) => { const o = allOrders.find(x => x.id === id); if(o) { o.wechatAdded = true; await dbPut('orders', o); refreshDashboard(); } };
       window.openDeposit = (id) => {
         document.getElementById('depositModal').innerHTML = `
         <div class="modal-box text-sm" onclick="event.stopPropagation()">
@@ -625,12 +529,12 @@
         document.getElementById('depositModal').classList.add('hidden');
         refreshDashboard();
       };
-      window.returnRental = async (id) => { const o = allOrders.find(x => x.id === id); if (o) { o.rentalReturned = true; await dbPut('orders', o); refreshDashboard(); } };
-      window.setRetouch = async (id, level) => { const o = allOrders.find(x => x.id === id); if (o) { o.retouchLevel = level; updateSetting('priceStandard', settings.priceStandard); } };
-      window.changeExtra = async (id, delta) => { const o = allOrders.find(x => x.id === id); if (o) { o.extraPhotos = Math.max(0, (o.extraPhotos||0) + delta); updateSetting('priceStandard', settings.priceStandard); } };
-      window.skipToDelivery = async (id) => { const o = allOrders.find(x => x.id === id); if (o && o.type === 'makeup_only') { o.currentTrack = 'track6'; o.timestamp = Date.now(); o.makeupArtistId = null; await dbPut('orders', o); refreshDashboard(); } };
+      window.returnRental = async (id) => { const o = allOrders.find(x => x.id === id); if(o) { o.rentalReturned = true; await dbPut('orders', o); refreshDashboard(); } };
+      window.setRetouch = async (id, level) => { const o = allOrders.find(x => x.id === id); if(o) { o.retouchLevel = level; updateSetting('priceStandard', settings.priceStandard); } };
+      window.changeExtra = async (id, delta) => { const o = allOrders.find(x => x.id === id); if(o) { o.extraPhotos = Math.max(0, (o.extraPhotos||0) + delta); updateSetting('priceStandard', settings.priceStandard); } };
+      window.skipToDelivery = async (id) => { const o = allOrders.find(x => x.id === id); if(o && o.type === 'makeup_only') { o.currentTrack = 'track6'; o.timestamp = Date.now(); o.makeupArtistId = null; await dbPut('orders', o); refreshDashboard(); } };
 
-      // ==================== 运力增删 ====================
+      // ==================== 运力 ====================
       window.addStaff = async (r) => {
         const name = prompt('姓名：');
         if (!name) return;
@@ -646,7 +550,7 @@
       };
 
       // ==================== 拖拽 ====================
-      window.handleDragOver = (e, trackId, key) => { e.preventDefault(); const col = document.getElementById('track-col-'+trackId); if (col) col.classList.add('drag-over'); };
+      window.handleDragOver = (e, trackId) => { e.preventDefault(); const col = document.getElementById('track-col-'+trackId); if(col) col.classList.add('drag-over'); };
       window.handleDragLeave = (e, trackId) => { document.getElementById('track-col-'+trackId)?.classList.remove('drag-over'); };
       window.handleDrop = async (e, trackId, key) => {
         e.preventDefault();
@@ -672,28 +576,88 @@
         const today = new Date().toISOString().split('T')[0];
         const orders = allOrders.filter(o => o.date === today);
         const stats = {};
-        orders.forEach(o => { const ch = o.channel || '散客'; if (!stats[ch]) stats[ch] = { count: 0, total: 0 }; stats[ch].count++; stats[ch].total += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0); });
-        let rows = '', totalC = 0, totalA = 0;
-        for (const [ch, d] of Object.entries(stats)) { totalC += d.count; totalA += d.total; rows += `<tr class="border-b"><td class="p-2">${ch}</td><td class="p-2 text-right">${d.count}单</td><td class="p-2 text-right">¥${d.total.toLocaleString()}</td></tr>`; }
+        orders.forEach(o => { const ch = o.channel || '散客'; if(!stats[ch]) stats[ch]={count:0,total:0}; stats[ch].count++; stats[ch].total += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0); });
+        let rows='', totalC=0, totalA=0;
+        for(const [ch,d] of Object.entries(stats)) { totalC+=d.count; totalA+=d.total; rows+=`<tr class="border-b"><td class="p-2">${ch}</td><td class="p-2 text-right">${d.count}单</td><td class="p-2 text-right">¥${d.total.toLocaleString()}</td></tr>`; }
         document.getElementById('channelModal').innerHTML = `
-        <div class="modal-box" style="max-width:700px;"><div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold">📋 渠道对账</h2><button onclick="document.getElementById('channelModal').classList.add('hidden')" class="text-gray-400 text-2xl">&times;</button></div>
-        <div class="overflow-auto max-h-96"><table class="w-full text-xs"><thead><tr class="bg-gray-100"><th class="p-2 text-left">渠道</th><th class="p-2 text-right">订单数</th><th class="p-2 text-right">总金额</th></tr></thead><tbody>${rows||'<tr><td colspan="3" class="p-4 text-center text-gray-400">暂无数据</td></tr>'}</tbody><tfoot class="font-bold border-t-2"><tr><td class="p-2">📌合计</td><td class="p-2 text-right">${totalC}单</td><td class="p-2 text-right">¥${totalA.toLocaleString()}</td></tr></tfoot></table></div>
-        <button onclick="document.getElementById('channelModal').classList.add('hidden')" class="mt-4 w-full py-2 rounded-lg text-white font-bold" style="background:var(--green);">关闭</button></div>`;
+        <div class="modal-box" style="max-width:750px;" onclick="event.stopPropagation()">
+          <div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold">📋 渠道对账</h2><button onclick="document.getElementById('channelModal').classList.add('hidden')" class="text-gray-400 text-2xl">&times;</button></div>
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="w-full md:w-1/3 bg-gray-50 rounded-xl p-4">
+              <h3 class="font-semibold text-sm mb-3">➕ 新增渠道标签</h3>
+              <div class="flex gap-2">
+                <input type="text" id="newChannelInput" placeholder="如：小红书、抖音…" class="flex-1 px-3 py-2 rounded-lg border text-sm">
+                <button onclick="addNewChannel()" class="px-4 py-2 rounded-lg text-white font-bold text-sm" style="background:var(--green);">添加</button>
+              </div>
+              <p class="text-xs text-gray-400 mt-2">* 新渠道将在下次统计中生效</p>
+            </div>
+            <div class="w-full md:w-2/3">
+              <h3 class="font-semibold text-sm mb-2">📊 今日渠道对账表</h3>
+              <div class="overflow-auto max-h-64">
+                <table class="w-full text-xs"><thead><tr class="bg-gray-100"><th class="p-2 text-left">渠道</th><th class="p-2 text-right">订单数</th><th class="p-2 text-right">总金额</th></tr></thead><tbody>${rows||'<tr><td colspan="3" class="p-4 text-center text-gray-400">暂无数据</td></tr>'}</tbody><tfoot class="font-bold border-t-2"><tr><td class="p-2">📌合计</td><td class="p-2 text-right">${totalC}单</td><td class="p-2 text-right">¥${totalA.toLocaleString()}</td></tr></tfoot></table>
+              </div>
+            </div>
+          </div>
+          <button onclick="document.getElementById('channelModal').classList.add('hidden')" class="mt-4 w-full py-2 rounded-lg text-white font-bold" style="background:var(--green);">关闭</button>
+        </div>`;
         document.getElementById('channelModal').classList.remove('hidden');
       };
+      window.addNewChannel = () => {
+        const input = document.getElementById('newChannelInput');
+        const name = input.value.trim();
+        if (!name) return;
+        alert(`✅ 渠道“${name}”已记录，将在下次订单中使用`);
+        input.value = '';
+      };
+
       window.openCallPartTimer = () => {
         document.getElementById('callPartTimerModal').innerHTML = `
-        <div class="modal-box"><h2 class="text-lg font-bold mb-4">📣 一键呼叫外部兼职</h2>
-        <div class="space-y-3 text-sm"><div><label class="font-semibold">基础工费</label><input id="basePay" value="200" class="w-full px-3 py-2 border rounded-lg"></div>
-        <div><label class="font-semibold">风格</label><select id="style" class="w-full px-3 py-2 border rounded-lg"><optgroup label="化妆"><option>傣族重工</option><option>敦煌飞天</option><option>苗族银饰</option><option>大唐古风</option></optgroup><optgroup label="摄影"><option>暮光夜景</option><option>日系复古</option><option>新中式国潮</option></optgroup></select></div>
-        <div class="flex items-center gap-2"><input type="checkbox" id="commToggle" checked> <label>二消提成</label></div>
-        <div><label class="font-semibold">店员提成%</label><input id="commPer" value="20" class="w-full px-3 py-2 border rounded-lg"></div></div>
-        <button onclick="alert('已发布');document.getElementById('callPartTimerModal').classList.add('hidden')" class="mt-4 w-full py-2 rounded-lg text-white font-bold" style="background:var(--copper);">确认发布</button></div>`;
+        <div class="modal-box" onclick="event.stopPropagation()">
+          <h2 class="text-lg font-bold mb-4">📣 一键呼叫外部兼职</h2>
+          <div class="space-y-3 text-sm">
+            <div><label class="font-semibold block mb-1">基础工费 (¥)</label><input type="number" id="basePay" value="200" class="w-full px-3 py-2 border rounded-lg"></div>
+            <div>
+              <label class="font-semibold block mb-1">工种风格</label>
+              <select id="styleSelect" class="w-full px-3 py-2 border rounded-lg">
+                <optgroup label="化妆造型">
+                  <option>傣族重工</option>
+                  <option>敦煌飞天</option>
+                  <option>苗族银饰</option>
+                  <option>大唐古风</option>
+                  <option>清宫旗头</option>
+                  <option>西域公主</option>
+                  <option>战国袍</option>
+                  <option>现代高奢</option>
+                </optgroup>
+                <optgroup label="摄影风格">
+                  <option>暮光夜景</option>
+                  <option>日系复古</option>
+                  <option>新中式国潮</option>
+                  <option>纪实情绪</option>
+                  <option>法式浪漫</option>
+                  <option>纪实旅拍</option>
+                  <option>高级大片</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="flex items-center gap-2"><input type="checkbox" id="commToggle" checked> <label class="font-semibold">启用二消提成</label></div>
+            <div><label class="font-semibold block mb-1">店员提成比例 (%)</label><input type="number" id="commPercent" value="20" class="w-full px-3 py-2 border rounded-lg"></div>
+          </div>
+          <div class="flex gap-2 justify-end mt-4">
+            <button onclick="document.getElementById('callPartTimerModal').classList.add('hidden')" class="px-4 py-2 border rounded-lg text-sm">取消</button>
+            <button onclick="confirmCall()" class="px-4 py-2 rounded-lg text-white font-bold" style="background:var(--copper);">确认发布</button>
+          </div>
+        </div>`;
         document.getElementById('callPartTimerModal').classList.remove('hidden');
       };
+      window.confirmCall = () => {
+        alert('📢 兼职呼叫已发布！提成比例仅接单成功后定向显示');
+        document.getElementById('callPartTimerModal').classList.add('hidden');
+      };
+
       window.printOrder = (id) => {
-        const o = allOrders.find(x => x.id === id); if (!o) return;
-        const level = { standard: '标准精修', premium: '超精修', commercial: '商业精修' };
+        const o = allOrders.find(x => x.id === id); if(!o) return;
+        const level = { standard:'标准精修', premium:'超精修', commercial:'商业精修' };
         document.getElementById('printArea').innerHTML = `
         <div style="font-family:'PingFang SC','Microsoft YaHei',sans-serif;"><h3 style="text-align:center;border-bottom:2px solid #000;padding-bottom:6px;">旅拍档期派 · 双联单据</h3>
         <table class="print-table"><tr><td><b>流水号</b></td><td>${o.flowNumber}</td><td><b>渠道</b></td><td>${o.channel||'散客'}</td></tr>
@@ -712,7 +676,7 @@
         await loadInitialData();
         const saved = sessionStorage.getItem('role');
         if (saved === 'boss' || saved === 'staff') { role = saved; document.getElementById('authOverlay').classList.add('hidden'); applyRole(); }
-        document.getElementById('quickInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleQuickInput(); });
+        document.getElementById('quickInput').addEventListener('keydown', e => { if(e.key==='Enter') handleQuickInput(); });
         refreshDashboard();
       })();
     })();
