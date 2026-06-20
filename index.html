@@ -663,76 +663,112 @@
         function closeChannelModal() { document.getElementById('modal-channel').classList.add('hidden'); }
 
         // 9. 人员运力池管理机制
-        function initStaffPool() {
-            const tx = db.transaction("staff", "readonly");
-            const store = tx.objectStore("staff");
-            store.getAll().onsuccess = (e) => {
-                const list = e.target.result;
-                if (list.length === 0) {
-                    // 内置基础体验种子人员
-                    const seeds = [
-                        { id: "m1", name: "化妆师·琳达", type: "makeup" },
-                        { id: "m2", name: "化妆师·小雅", type: "makeup" },
-                        { id: "m3", name: "化妆师·艾米", type: "makeup" },
-                        { id: "p1", name: "摄影师·阿杰", type: "photo" },
-                        { id: "p2", name: "摄影师·浩然", type: "photo" },
-                        { id: "p3", name: "摄影师·子轩", type: "photo" }
-                    ];
-                    const wtx = db.transaction("staff", "readwrite");
-                    seeds.forEach(s => wtx.objectStore("staff").put(s));
-                    wtx.oncomplete = () => refreshDashboard();
-                }
+        // ========================= 9. 人员运力池管理机制 (成品级修复补丁) =========================
+function initStaffPool() {
+    const tx = db.transaction("staff", "readonly");
+    const store = tx.objectStore("staff");
+    
+    store.getAll().onsuccess = (e) => {
+        const list = e.target.result;
+        // 如果运力池为空，自动预埋首批默认种子运力，确保冷启动不白屏
+        if (list.length === 0) {
+            const seeds = [
+                { id: "seed-m1", name: "化妆师·琳达", type: "makeup" },
+                { id: "seed-m2", name: "化妆师·小雅", type: "makeup" },
+                { id: "seed-m3", name: "化妆师·艾米", type: "makeup" },
+                { id: "seed-p1", name: "摄影师·阿杰", type: "photo" },
+                { id: "seed-p2", name: "摄影师·浩然", type: "photo" },
+                { id: "seed-p3", name: "摄影师·子轩", type: "photo" }
+            ];
+            const wtx = db.transaction("staff", "readwrite");
+            const wStore = wtx.objectStore("staff");
+            seeds.forEach(s => wStore.put(s));
+            wtx.oncomplete = () => {
+                console.log("【运力池】首批基础种子技师已成功预埋入库。");
+                refreshDashboard();
             };
         }
+    };
+}
 
-        function updateStaffUI(staffCounts) {
-            const mPool = document.getElementById('makeup-pool');
-            const pPool = document.getElementById('photographer-pool');
-            mPool.innerHTML = ""; pPool.innerHTML = "";
+function updateStaffUI(staffCounts) {
+    const mPool = document.getElementById('makeup-pool');
+    const pPool = document.getElementById('photographer-pool');
+    if (!mPool || !pPool) return;
+    
+    mPool.innerHTML = ""; 
+    pPool.innerHTML = "";
 
-            const tx = db.transaction("staff", "readonly");
-            tx.objectStore("staff").getAll().onsuccess = (e) => {
-                e.target.result.forEach(s => {
-                    const count = staffCounts[s.name] || 0;
-                    const el = document.createElement('div');
-                    el.className = "p-2.5 bg-slate-50 border border-slate-200/60 rounded-xl flex items-center justify-between text-xs";
-                    el.innerHTML = `
-                        <div>
-                            <p class="font-bold text-slate-800">${s.name}</p>
-                            <p class="text-[10px] text-slate-400 mt-0.5">${count > 0 ? '🟡 忙碌中' : '🟢 空闲'}</p>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="font-bold text-slate-600">${count}单</span>
-                            <button onclick="removeStaff('${s.id}', ${count})" class="text-slate-300 hover:text-rose-500 font-bold px-1 text-sm">✕</button>
-                        </div>
-                    `;
-                    if (s.type === 'makeup') mPool.appendChild(el);
-                    else pPool.appendChild(el);
-                });
-            };
+    const tx = db.transaction("staff", "readonly");
+    tx.objectStore("staff").getAll().onsuccess = (e) => {
+        const allStaff = e.target.result;
+        
+        allStaff.forEach(s => {
+            const count = staffCounts[s.name] || 0;
+            const el = document.createElement('div');
+            el.className = "p-2.5 bg-slate-50 border border-slate-200/60 rounded-xl flex items-center justify-between text-xs transition-all";
+            el.innerHTML = `
+                <div>
+                    <p class="font-bold text-slate-800">${s.name}</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">${count > 0 ? '🟡 忙碌中' : '🟢 空闲'}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="font-bold text-slate-600">${count}单</span>
+                    <button onclick="removeStaff('${s.id}', ${count})" class="text-slate-300 hover:text-rose-500 font-bold px-1 text-sm transition-colors">✕</button>
+                </div>
+            `;
+            if (s.type === 'makeup') mPool.appendChild(el);
+            else pPool.appendChild(el);
+        });
+    };
+}
+
+function addStaff(type) {
+    const rawName = prompt("请输入要上岗的人员姓名:");
+    if (!rawName || !rawName.trim()) return;
+    
+    const cleanName = rawName.trim();
+    let finalName = cleanName;
+    
+    // 【核心自动化前缀卡点逻辑】：自动补齐行业工种前缀，防前台错输漏输
+    if (type === 'makeup') {
+        if (!cleanName.startsWith('化妆师·') && !cleanName.startsWith('化妆师')) {
+            finalName = '化妆师·' + cleanName;
+        } else if (cleanName.startsWith('化妆师') && !cleanName.startsWith('化妆师·')) {
+            finalName = cleanName.replace('化妆师', '化妆师·');
         }
-
-        function addStaff(type) {
-            const name = prompt("请输入要上岗的人员姓名:");
-            if (!name) return;
-            const prefix = type === 'makeup' ? '化妆师·' : '摄影师·';
-            const finalName = name.startsWith('化妆') || name.startsWith('摄影') ? name : prefix + name;
-            
-            const id = "st-" + Date.now();
-            const tx = db.transaction("staff", "readwrite");
-            tx.objectStore("staff").put({ id: id, name: finalName, type: type });
-            tx.oncomplete = () => refreshDashboard();
+    } else if (type === 'photo') {
+        if (!cleanName.startsWith('摄影师·') && !cleanName.startsWith('摄影师')) {
+            finalName = '摄影师·' + cleanName;
+        } else if (cleanName.startsWith('摄影师') && !cleanName.startsWith('摄影师·')) {
+            finalName = cleanName.replace('摄影师', '摄影师·');
         }
+    }
 
-        function removeStaff(id, currentCount) {
-            if (currentCount > 0) {
-                alert("🔒 运力安全拦截：该技术人员当前正有流转中的客人，无法删除下班！");
-                return;
-            }
-            const tx = db.transaction("staff", "readwrite");
-            tx.objectStore("staff").delete(id);
-            tx.oncomplete = () => refreshDashboard();
-        }
+    const uniqueId = "staff-id-" + Date.now();
+    const tx = db.transaction("staff", "readwrite");
+    const store = tx.objectStore("staff");
+    
+    store.put({ id: uniqueId, name: finalName, type: type });
+    tx.oncomplete = () => {
+        console.log(`【运力新增】${finalName} 已成功写入本地数据库`);
+        refreshDashboard();
+    };
+}
+
+function removeStaff(id, currentCount) {
+    if (currentCount > 0) {
+        alert("🔒 运力安全拦截：该技术人员当前正有流转中的客人，为了防止现场丢单，无法删除下班！");
+        return;
+    }
+    const tx = db.transaction("staff", "readwrite");
+    tx.objectStore("staff").delete(id);
+    tx.oncomplete = () => {
+        console.log(`【运力缩减】人员已被安全移除下班`);
+        refreshDashboard();
+    };
+}
+// =========================================================================================
 
         // 10. 首屏自启与拦截审查
         window.addEventListener('DOMContentLoaded', () => {
