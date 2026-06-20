@@ -1,891 +1,684 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>旅拍档期派 · 商家控制台</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-    <style>
-        :root {
-            --bg: #F8F9FA;
-            --card: #FFFFFF;
-            --border: #E2E8F0;
-            --green: #00C853;
-            --yellow: #FFE100;
-            --copper: #D84315;
-            --text: #1a1a2e;
-            --glass: rgba(255, 255, 255, 0.78);
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08);
-        }
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .topnav-glass {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            z-index: 100;
-        }
-        .staff-wall {
-            background: var(--card);
-            border-right: 1px solid var(--border);
-            z-index: 50;
-        }
-        .staff-card {
-            background: var(--bg);
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            transition: 0.25s;
-        }
-        .staff-card.overload {
-            border-color: var(--yellow) !important;
-            animation: breathe 0.7s infinite;
-        }
-        @keyframes breathe {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 225, 0, 0.3); }
-            50% { box-shadow: 0 0 25px rgba(255, 225, 0, 0.7); }
-        }
-        .track-column {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            flex-direction: column;
-            transition: 0.2s;
-        }
-        .track-header {
-            flex-shrink: 0;
-            padding: 12px 8px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            background: var(--card);
-            border-radius: 20px 20px 0 0;
-            z-index: 2;
-        }
-        .track-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px 6px;
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-        }
-        .order-card {
-            background: #fff;
-            border: 1.5px solid var(--border);
-            border-radius: 14px;
-            padding: 10px;
-            box-shadow: var(--shadow-sm);
-            transition: 0.3s;
-            font-size: 13px;
-        }
-        .btn-action {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 5px 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: #fff;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .btn-green {
-            background: #e8f5e9;
-            border-color: #a5d6a7;
-            color: #1b5e20;
-        }
-        .btn-copper {
-            background: #fbe9e7;
-            border-color: #ffab91;
-            color: #bf360c;
-        }
-        .btn-disabled {
-            opacity: 0.4;
-            pointer-events: none;
-        }
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-box {
-            background: #fff;
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: var(--shadow-lg);
-            max-width: 500px;
-            width: 90%;
-        }
-        @media print {
-            body * { visibility: hidden !important; }
-            #printArea, #printArea * { visibility: visible !important; }
-            #printArea {
-                position: fixed !important;
-                left: 0;
-                top: 0;
-                width: 100%;
-                max-width: 297mm;
-                padding: 8mm;
-                background: #fff;
-                z-index: 99999;
-                font-size: 10px;
-            }
-            #printArea table { width: 100%;
-                border-collapse: collapse; }
-            #printArea td { border: 0.5px solid #999;
-                padding: 4px; }
-            @page { size: A4 landscape;
-                margin: 2mm; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>旅拍档期派 · 商家控制台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #F8F9FA; --card: #FFFFFF; --border: #E2E8F0; --green: #00C853;
+      --yellow: #FFE100; --copper: #D84315; --text: #1a1a2e;
+      --glass: rgba(255,255,255,0.78); --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.06); --shadow-lg: 0 12px 32px rgba(0,0,0,0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+      background: var(--bg); color: var(--text); margin: 0; height: 100vh; overflow: hidden;
+      user-select: none; -webkit-user-select: none;
+    }
+    .topnav-glass {
+      background: var(--glass); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 100;
+    }
+    .staff-wall { background: var(--card); border-right: 1px solid var(--border); }
+    .staff-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; transition: 0.25s; }
+    .staff-card.overload { border-color: var(--yellow) !important; animation: breathe 0.7s infinite; }
+    @keyframes breathe { 0%,100%{box-shadow:0 0 10px rgba(255,225,0,0.3)} 50%{box-shadow:0 0 25px rgba(255,225,0,0.7)} }
+    .track-column {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      box-shadow: var(--shadow-sm); display: flex; flex-direction: column; transition: 0.2s;
+      min-width: 0; /* 防止溢出 */
+    }
+    .track-header {
+      flex-shrink:0; padding:12px 8px; text-align:center; border-bottom:1px solid var(--border);
+      background: var(--card); border-radius:20px 20px 0 0; z-index:2;
+    }
+    .track-body { flex:1; overflow-y:auto; padding:8px 6px; display:flex; flex-direction:column; gap:7px; }
+    .order-card {
+      background:#fff; border:1.5px solid var(--border); border-radius:14px; padding:10px;
+      box-shadow:var(--shadow-sm); transition:0.3s; font-size:13px; cursor: pointer;
+    }
+    .btn-action {
+      font-size:11px; font-weight:600; padding:5px 10px; border-radius:8px;
+      border:1px solid var(--border); background:#fff; cursor:pointer; white-space:nowrap;
+    }
+    .btn-green { background:#e8f5e9; border-color:#a5d6a7; color:#1b5e20; }
+    .btn-copper { background:#fbe9e7; border-color:#ffab91; color:#bf360c; }
+    .btn-disabled { opacity:0.4; pointer-events:none; }
+    .modal-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px);
+      z-index:999; display:flex; align-items:center; justify-content:center;
+    }
+    .modal-box {
+      background:#fff; border-radius:20px; padding:24px; box-shadow:var(--shadow-lg);
+      max-width:580px; width:90%; max-height:85vh; overflow-y:auto;
+    }
+    @media (max-width: 767px) {
+      .track-column { border-radius: 16px; }
+      .track-header { border-radius:16px 16px 0 0; }
+    }
+    @media print {
+      body * { visibility:hidden!important; }
+      #printArea, #printArea * { visibility:visible!important; }
+      #printArea { position:fixed!important; left:0; top:0; width:100%; max-width:297mm; padding:8mm; background:#fff; z-index:99999; font-size:10px; }
+      #printArea table { width:100%; border-collapse:collapse; }
+      #printArea td { border:0.5px solid #999; padding:4px; }
+      @page { size:A4 landscape; margin:2mm; }
+    }
+  </style>
 </head>
 <body class="h-screen flex flex-col">
 
 <!-- 登录遮罩 -->
 <div id="authOverlay" class="fixed inset-0 z-[99999] flex items-center justify-center bg-white/80 backdrop-blur-xl">
-    <div class="bg-white rounded-3xl shadow-2xl p-8 w-80 text-center">
-        <div class="text-3xl font-bold mb-2" style="color:var(--green);">旅拍档期派</div>
-        <div class="text-xs text-gray-400 mb-6">商家控制台</div>
-        <input type="password" id="passwordInput" placeholder="请输入密码" class="w-full px-4 py-3 border rounded-xl mb-4 text-sm outline-none">
-        <button id="loginBtn" class="w-full py-3 rounded-xl text-white font-bold" style="background:var(--green);">进入控制台</button>
-        <p class="text-xs text-gray-400 mt-4">员工密码：staff888 ｜ 老板密码：boss999</p>
-    </div>
+  <div class="bg-white rounded-3xl shadow-2xl p-8 w-80 text-center">
+    <div class="text-3xl font-bold mb-2" style="color:var(--green);">旅拍档期派</div>
+    <div class="text-xs text-gray-400 mb-6">商家控制台</div>
+    <input type="password" id="passwordInput" placeholder="请输入密码" class="w-full px-4 py-3 border rounded-xl mb-4 text-sm outline-none">
+    <button id="loginBtn" class="w-full py-3 rounded-xl text-white font-bold" style="background:var(--green);">进入控制台</button>
+    <p class="text-xs text-gray-400 mt-4">员工密码：staff888 ｜ 老板密码：boss999</p>
+  </div>
 </div>
 
 <!-- 顶部导航 -->
-<header class="topnav-glass flex items-center justify-between px-5 py-3 flex-shrink-0 gap-4 flex-wrap">
-    <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-extrabold"
-             style="background:linear-gradient(135deg,#00C853,#00a844);">派
-        </div>
-        <div>
-            <h1 class="text-base font-bold text-gray-900">旅拍档期派 · 商家控制台</h1>
-            <p class="text-xs text-gray-500">LIVE SCHEDULING</p>
-        </div>
-    </div>
-    <button onclick="openCallModal()" class="px-4 py-2 rounded-xl font-bold shadow-md text-sm flex items-center justify-center"
-            style="background:#fff; border:2px solid var(--yellow); color:#1a1a2e;">一键呼叫外部兼职
-    </button>
-    <div class="flex items-center gap-3">
-        <div class="text-right"><span class="text-xs text-gray-500 block">今日营业额</span><span
-                    class="text-2xl font-extrabold" style="color:var(--green);" id="todayRevenue">¥0</span></div>
-        <button onclick="openChannelReport()" id="channelBtn" class="btn-action">📋 渠道</button>
-        <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-500">退出</button>
-    </div>
-    <div class="flex items-center gap-2 flex-shrink-0 min-w-[260px]">
-        <input type="text" id="quickInput" placeholder="姓名 电话 定金 渠道 支付方式"
-               class="flex-1 px-4 py-2.5 rounded-xl border text-sm bg-white/80 outline-none">
-        <button onclick="handleQuickInput()" class="px-4 py-2.5 rounded-xl text-white font-bold"
-                style="background:var(--green);">↵
-        </button>
-    </div>
+<header class="topnav-glass flex items-center justify-between px-3 md:px-5 py-3 flex-shrink-0 gap-2 flex-wrap">
+  <div class="flex items-center gap-3 flex-shrink-0">
+    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-white font-extrabold text-sm" style="background:linear-gradient(135deg,#00C853,#00a844);">派</div>
+    <div class="hidden sm:block"><h1 class="text-base font-bold text-gray-900">旅拍档期派 · 商家控制台</h1><p class="text-xs text-gray-500">LIVE SCHEDULING</p></div>
+  </div>
+  <button onclick="openCallModal()" class="px-3 py-2 rounded-xl font-bold shadow-md text-xs sm:text-sm flex items-center justify-center whitespace-nowrap" style="background:#fff; border:2px solid var(--yellow); color:#1a1a2e;">一键呼叫</button>
+  <div class="flex items-center gap-2">
+    <div class="text-right"><span class="text-xs text-gray-500">营业额</span><span class="text-lg md:text-2xl font-extrabold block" style="color:var(--green);" id="todayRevenue">¥0</span></div>
+    <button onclick="openChannelReport()" id="channelBtn" class="btn-action text-xs">📋 渠道</button>
+    <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-500">退出</button>
+  </div>
+  <div class="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
+    <input type="text" id="quickInput" placeholder="姓名 电话 定金 渠道 支付" class="flex-1 px-3 py-2 rounded-xl border text-xs sm:text-sm bg-white/80 outline-none">
+    <button onclick="handleQuickInput()" class="px-3 py-2 rounded-xl text-white font-bold text-sm" style="background:var(--green);">↵</button>
+  </div>
 </header>
 
-<!-- 主体 -->
-<div class="flex flex-1 overflow-hidden" style="min-height:0;">
-    <aside class="staff-wall w-[15%] min-w-[160px] flex flex-col overflow-y-auto flex-shrink-0 p-3 gap-3"
-           id="staffWall">
-        <div class="text-xs font-bold text-gray-500 text-center">💄 化妆师</div>
-        <div id="makeupList" class="flex flex-col gap-2"></div>
-        <hr class="my-2">
-        <div class="text-xs font-bold text-gray-500 text-center">📷 摄影师</div>
-        <div id="photoList" class="flex flex-col gap-2"></div>
-        <div class="mt-auto text-center space-x-3">
-            <button onclick="addStaff('makeup')" class="text-xs text-gray-400 hover:text-gray-600">+ 添化妆师</button>
-            <button onclick="addStaff('photo')" class="text-xs text-gray-400 hover:text-gray-600">+ 添摄影师</button>
-        </div>
-    </aside>
-    <main class="flex-1 flex gap-3 p-3 overflow-hidden" id="trackContainer"></main>
+<!-- 主体区域 -->
+<div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
+  <!-- 运力墙：手机/平板横向，大屏纵向侧边栏 -->
+  <aside class="staff-wall lg:w-[15%] lg:min-w-[160px] w-full lg:max-w-[200px] flex-shrink-0 overflow-y-auto lg:overflow-y-auto lg:h-full h-auto max-h-[110px] lg:max-h-full overflow-x-auto lg:overflow-x-hidden p-2 lg:p-3 gap-2 flex flex-row lg:flex-col" id="staffWall">
+    <div class="flex lg:flex-col gap-2 w-full">
+      <div class="text-xs font-bold text-gray-500 whitespace-nowrap">💄 化妆师</div>
+      <div id="makeupList" class="flex flex-row lg:flex-col gap-2"></div>
+      <div class="text-xs font-bold text-gray-500 whitespace-nowrap">📷 摄影师</div>
+      <div id="photoList" class="flex flex-row lg:flex-col gap-2"></div>
+    </div>
+    <div class="mt-auto flex gap-2 justify-center lg:flex-col items-center">
+      <button onclick="addStaff('makeup')" class="text-xs text-gray-400 hover:text-gray-600 whitespace-nowrap">+ 添化妆师</button>
+      <button onclick="addStaff('photo')" class="text-xs text-gray-400 hover:text-gray-600 whitespace-nowrap">+ 添摄影师</button>
+    </div>
+  </aside>
+
+  <!-- 轨道区 -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <!-- 移动端标签页 -->
+    <div class="md:hidden flex gap-1 p-2 overflow-x-auto bg-white/50 backdrop-blur-sm" id="mobileTabs">
+      <button class="tab-btn px-3 py-1 rounded-full text-xs font-semibold bg-gray-100" data-track="track1">📋到店</button>
+      <button class="tab-btn px-3 py-1 rounded-full text-xs font-semibold bg-gray-100" data-track="track2">👗选衣</button>
+      <button class="tab-btn px-3 py-1 rounded-full text-xs font-semibold bg-gray-100" data-track="track3">💄妆造</button>
+      <button class="tab-btn px-3 py-1 rounded-full text-xs font-semibold bg-gray-100" data-track="track4">📷摄影</button>
+      <button class="tab-btn px-3 py-1 rounded-full text-xs font-semibold bg-gray-100" data-track="track5">🖼️选片</button>
+      <button class="tab-btn px-3 py-1 rounded-full text-xs font-semibold bg-gray-100" data-track="track6">✅交付</button>
+    </div>
+
+    <!-- 轨道容器 -->
+    <div id="trackContainer" class="flex-1 overflow-hidden p-2 md:p-3 flex flex-col md:grid md:grid-cols-3 lg:flex lg:flex-row gap-2 md:gap-3">
+      <!-- 动态渲染轨道 -->
+    </div>
+  </main>
 </div>
 
 <!-- 自定义模态窗 -->
 <div id="customModal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
-    <div class="modal-box text-center">
-        <h3 id="modalTitle" class="font-bold text-lg mb-3"></h3>
-        <p id="modalMessage" class="text-sm text-gray-600 mb-4"></p>
-        <div id="modalActions" class="flex justify-center gap-3"></div>
-    </div>
+  <div class="modal-box text-center" id="customModalContent"></div>
 </div>
-
-<!-- 打印区 -->
 <div id="printArea" style="display:none;"></div>
 
 <script>
-    (() => {
-        // ==================== IndexedDB ====================
-        const DB_NAME = 'TravelScheduler';
-        let db;
-        function openDB() {
-            return new Promise((resolve, reject) => {
-                const req = indexedDB.open(DB_NAME, 1);
-                req.onupgradeneeded = (e) => {
-                    const d = e.target.result;
-                    if (!d.objectStoreNames.contains('orders')) d.createObjectStore('orders', { keyPath: 'id' });
-                    if (!d.objectStoreNames.contains('staff')) d.createObjectStore('staff', { keyPath: 'id' });
-                    if (!d.objectStoreNames.contains('settings')) d.createObjectStore('settings', { keyPath: 'key' });
-                };
-                req.onsuccess = (e) => { db = e.target.result; resolve(db); };
-                req.onerror = (e) => reject(e.target.error);
-            });
-        }
-        function dbPut(store, data) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(store, 'readwrite');
-                tx.objectStore(store).put(data);
-                tx.oncomplete = () => resolve();
-                tx.onerror = (e) => reject(e.target.error);
-            });
-        }
-        function dbGetAll(store) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(store, 'readonly');
-                const req = tx.objectStore(store).getAll();
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = (e) => reject(e.target.error);
-            });
-        }
-        function dbDelete(store, id) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(store, 'readwrite');
-                tx.objectStore(store).delete(id);
-                tx.oncomplete = () => resolve();
-                tx.onerror = (e) => reject(e.target.error);
-            });
-        }
+(() => {
+  // ========== IndexedDB ==========
+  const DB_NAME = 'TravelSchedulerV2';
+  let db;
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = (e) => {
+        const d = e.target.result;
+        if (!d.objectStoreNames.contains('orders')) d.createObjectStore('orders', { keyPath: 'id' });
+        if (!d.objectStoreNames.contains('staff')) d.createObjectStore('staff', { keyPath: 'id' });
+        if (!d.objectStoreNames.contains('settings')) d.createObjectStore('settings', { keyPath: 'key' });
+      };
+      req.onsuccess = (e) => { db = e.target.result; resolve(db); };
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+  function dbPut(store, data) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, 'readwrite');
+      tx.objectStore(store).put(data);
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  }
+  function dbGetAll(store) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, 'readonly');
+      const req = tx.objectStore(store).getAll();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = (e) => reject(e.target.error);
+    });
+  }
+  function dbDelete(store, id) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, 'readwrite');
+      tx.objectStore(store).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  }
 
-        // ==================== 权限 ====================
-        const PASS = { staff: 'staff888', boss: 'boss999' };
-        let role = null;
-        function applyRole() {
-            if (role === 'staff') {
-                document.getElementById('todayRevenue').textContent = '***';
-                document.getElementById('channelBtn').classList.add('btn-disabled');
-            } else {
-                document.getElementById('channelBtn').classList.remove('btn-disabled');
-            }
-        }
-        document.getElementById('loginBtn').onclick = () => {
-            const pwd = document.getElementById('passwordInput').value;
-            if (pwd === PASS.boss) {
-                role = 'boss';
-                sessionStorage.setItem('role', 'boss');
-                document.getElementById('authOverlay').classList.add('hidden');
-                applyRole();
-                refreshDashboard();
-            } else if (pwd === PASS.staff) {
-                role = 'staff';
-                sessionStorage.setItem('role', 'staff');
-                document.getElementById('authOverlay').classList.add('hidden');
-                applyRole();
-                refreshDashboard();
-            } else {
-                showModal('密码错误', '请重新输入');
-            }
-        };
-        window.logout = () => { sessionStorage.removeItem('role'); location.reload(); };
+  // ========== 权限 ==========
+  const PASS = { staff: 'staff888', boss: 'boss999' };
+  let role = null;
+  function applyRole() {
+    const revenueEl = document.getElementById('todayRevenue');
+    const channelBtn = document.getElementById('channelBtn');
+    if (role === 'staff') {
+      if (revenueEl) revenueEl.textContent = '***';
+      if (channelBtn) channelBtn.classList.add('btn-disabled');
+    } else {
+      if (channelBtn) channelBtn.classList.remove('btn-disabled');
+    }
+  }
+  document.getElementById('loginBtn').onclick = () => {
+    const pwd = document.getElementById('passwordInput').value;
+    if (pwd === PASS.boss) { role = 'boss'; sessionStorage.setItem('role','boss'); document.getElementById('authOverlay').classList.add('hidden'); applyRole(); refreshDashboard(); }
+    else if (pwd === PASS.staff) { role = 'staff'; sessionStorage.setItem('role','staff'); document.getElementById('authOverlay').classList.add('hidden'); applyRole(); refreshDashboard(); }
+    else showModal('密码错误', '请重新输入');
+  };
+  window.logout = () => { sessionStorage.removeItem('role'); location.reload(); };
 
-        // ==================== 自定义模态窗 ====================
-        function showModal(title, msg, type = 'info', onConfirm = null) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalMessage').innerText = msg;
-            const actions = document.getElementById('modalActions');
-            actions.innerHTML = '';
-            if (type === 'confirm') {
-                actions.innerHTML = `<button class="btn-action btn-copper px-4 py-2" onclick="closeModal()">取消</button>
-                <button class="btn-action btn-green px-4 py-2" id="modalConfirmBtn">确认</button>`;
-                document.getElementById('modalConfirmBtn').onclick = () => { closeModal(); if (onConfirm) onConfirm(); };
-            } else {
-                actions.innerHTML = `<button class="btn-action btn-green px-4 py-2" onclick="closeModal()">确定</button>`;
-            }
-            document.getElementById('customModal').classList.remove('hidden');
-        }
-        window.closeModal = () => document.getElementById('customModal').classList.add('hidden');
-        window.showModal = showModal;
+  // ========== 自定义模态 ==========
+  function showModal(title, message, type = 'info', onConfirm = null) {
+    const content = document.getElementById('customModalContent');
+    let actionsHtml = '';
+    if (type === 'confirm') {
+      actionsHtml = `<button class="btn-action btn-copper px-4 py-2" onclick="closeModal()">取消</button>
+        <button class="btn-action btn-green px-4 py-2" id="modalConfirmBtn">确认</button>`;
+    } else {
+      actionsHtml = `<button class="btn-action btn-green px-4 py-2" onclick="closeModal()">确定</button>`;
+    }
+    content.innerHTML = `<h3 class="font-bold text-lg mb-3">${title}</h3><p class="text-sm text-gray-600 mb-4">${message}</p><div class="flex justify-center gap-3">${actionsHtml}</div>`;
+    if (type === 'confirm' && onConfirm) {
+      document.getElementById('modalConfirmBtn').onclick = () => { closeModal(); onConfirm(); };
+    }
+    document.getElementById('customModal').classList.remove('hidden');
+  }
+  window.closeModal = () => document.getElementById('customModal').classList.add('hidden');
+  window.showModal = showModal;
 
-        // ==================== 数据模型 ====================
-        const TRACKS = [
-            { id: 'track1', name: '预约到店', icon: '📋', key: 'appointment' },
-            { id: 'track2', name: '选衣确认', icon: '👗', key: 'cloth' },
-            { id: 'track3', name: '妆造中', icon: '💄', key: 'styling' },
-            { id: 'track4', name: '指派摄影', icon: '📷', key: 'shooting' },
-            { id: 'track5', name: '选片', icon: '🖼️', key: 'selection' },
-            { id: 'track6', name: '精修交付', icon: '✅', key: 'delivery' }
-        ];
-        let allOrders = [], allStaff = [], flowCounter = 0;
-        let settings = { selectionMode: 'inStore', priceStandard: 40, pricePremium: 60, priceCommercial: 100 };
+  // ========== 数据模型 ==========
+  const TRACKS = [
+    { id:'track1', name:'预约到店', icon:'📋', key:'appointment' },
+    { id:'track2', name:'选衣确认', icon:'👗', key:'cloth' },
+    { id:'track3', name:'妆造中', icon:'💄', key:'styling' },
+    { id:'track4', name:'指派摄影', icon:'📷', key:'shooting' },
+    { id:'track5', name:'选片', icon:'🖼️', key:'selection' },
+    { id:'track6', name:'精修交付', icon:'✅', key:'delivery' }
+  ];
+  let allOrders = [], allStaff = [], flowCounter = 0;
+  let settings = { selectionMode:'inStore', priceStandard:40, pricePremium:60, priceCommercial:100 };
+  let currentMobileTab = 'track1'; // 手机端当前显示的轨道
 
-        function defStaff() {
-            return [
-                { id: 'staff_m1', name: '化妆师·琳达', role: 'makeup', status: 'idle', currentLoad: 0 },
-                { id: 'staff_m2', name: '化妆师·小雅', role: 'makeup', status: 'idle', currentLoad: 0 },
-                { id: 'staff_p1', name: '摄影师·阿杰', role: 'photo', status: 'idle', currentLoad: 0 },
-                { id: 'staff_p2', name: '摄影师·浩然', role: 'photo', status: 'idle', currentLoad: 0 }
-            ];
-        }
-        function defOrders() {
-            const t = new Date().toISOString().split('T')[0];
-            return [
-                {
-                    id: 'o1', flowNumber: '#001', name: '张美琳', phone: '13800001111', deposit: 300,
-                    channel: '美团', type: 'comprehensive', currentTrack: 'track1',
-                    timestamp: Date.now() - 3600000, wechatAdded: false,
-                    makeupArtistId: null, photographerId: null, depositAmount: 0,
-                    rentalReturned: false, extraPhotos: 0, retouchLevel: 'standard',
-                    extraCost: 0, totalAmount: 300, date: t, rentalDepositPaid: false,
-                    paymentMethod: '微信'
-                },
-                {
-                    id: 'o2', flowNumber: '#002', name: '李思远', phone: '13900002222', deposit: 500,
-                    channel: '导游小陈', type: 'photo_only', currentTrack: 'track4',
-                    timestamp: Date.now() - 1800000, wechatAdded: true,
-                    makeupArtistId: null, photographerId: 'staff_p1', depositAmount: 0,
-                    rentalReturned: false, extraPhotos: 5, retouchLevel: 'premium',
-                    extraCost: 300, totalAmount: 800, date: t, rentalDepositPaid: false,
-                    paymentMethod: '支付宝'
-                }
-            ];
-        }
+  function defStaff() {
+    return [
+      { id:'staff_m1', name:'化妆师·琳达', role:'makeup', status:'idle', currentLoad:0 },
+      { id:'staff_m2', name:'化妆师·小雅', role:'makeup', status:'idle', currentLoad:0 },
+      { id:'staff_p1', name:'摄影师·阿杰', role:'photo', status:'idle', currentLoad:0 },
+      { id:'staff_p2', name:'摄影师·浩然', role:'photo', status:'idle', currentLoad:0 }
+    ];
+  }
+  function defOrders() {
+    const t = new Date().toISOString().split('T')[0];
+    return [
+      { id:'o1', flowNumber:'#001', name:'张美琳', phone:'13800001111', deposit:300, channel:'美团', type:'comprehensive', currentTrack:'track1', timestamp:Date.now()-3600000, wechatAdded:false, makeupArtistId:null, photographerId:null, depositAmount:0, rentalReturned:false, extraPhotos:0, retouchLevel:'standard', extraCost:0, totalAmount:300, date:t, rentalDepositPaid:false, paymentMethod:'微信' },
+      { id:'o2', flowNumber:'#002', name:'李思远', phone:'13900002222', deposit:500, channel:'导游小陈', type:'photo_only', currentTrack:'track4', timestamp:Date.now()-1800000, wechatAdded:true, makeupArtistId:null, photographerId:'staff_p1', depositAmount:0, rentalReturned:false, extraPhotos:5, retouchLevel:'premium', extraCost:300, totalAmount:800, date:t, rentalDepositPaid:false, paymentMethod:'支付宝' }
+    ];
+  }
 
-        async function loadData() {
-            const [orders, staff, sets] = await Promise.all([dbGetAll('orders'), dbGetAll('staff'), dbGetAll('settings')]);
-            if (!orders.length && !staff.length) {
-                allStaff = defStaff();
-                allOrders = defOrders();
-                for (const s of allStaff) await dbPut('staff', s);
-                for (const o of allOrders) await dbPut('orders', o);
-            } else {
-                allStaff = staff.length ? staff : defStaff();
-                allOrders = orders;
-            }
-            if (sets.length) sets.forEach(s => { if (s.key) settings[s.key] = s.value; });
-            flowCounter = allOrders.length;
-            recalcStaff();
-        }
+  async function loadData() {
+    const [orders, staff, sets] = await Promise.all([dbGetAll('orders'), dbGetAll('staff'), dbGetAll('settings')]);
+    if (!orders.length && !staff.length) {
+      allStaff = defStaff(); allOrders = defOrders();
+      for (const s of allStaff) await dbPut('staff', s);
+      for (const o of allOrders) await dbPut('orders', o);
+    } else {
+      allStaff = staff.length ? staff : defStaff();
+      allOrders = orders;
+    }
+    if (sets.length) sets.forEach(s => { if (s.key) settings[s.key] = s.value; });
+    flowCounter = allOrders.length;
+    recalcStaff();
+  }
 
-        function recalcStaff() {
-            allStaff.forEach(s => { s.currentLoad = 0; s.status = 'idle'; });
-            allOrders.forEach(o => {
-                if (o.currentTrack === 'track3' && o.makeupArtistId) {
-                    const s = allStaff.find(x => x.id === o.makeupArtistId);
-                    if (s) s.currentLoad++;
-                }
-                if (o.currentTrack === 'track4' && o.photographerId) {
-                    const s = allStaff.find(x => x.id === o.photographerId);
-                    if (s) s.currentLoad++;
-                }
-            });
-            allStaff.forEach(s => {
-                if (s.currentLoad === 0) s.status = 'idle';
-                else if (s.currentLoad === 1) s.status = 'busy';
-                else s.status = 'overload';
-            });
-        }
+  function recalcStaff() {
+    allStaff.forEach(s => { s.currentLoad = 0; s.status = 'idle'; });
+    allOrders.forEach(o => {
+      if (o.currentTrack==='track3' && o.makeupArtistId) { const s = allStaff.find(x=>x.id===o.makeupArtistId); if(s) s.currentLoad++; }
+      if (o.currentTrack==='track4' && o.photographerId) { const s = allStaff.find(x=>x.id===o.photographerId); if(s) s.currentLoad++; }
+    });
+    allStaff.forEach(s => {
+      if (s.currentLoad===0) s.status='idle';
+      else if (s.currentLoad===1) s.status='busy';
+      else s.status='overload';
+    });
+  }
 
-        // ==================== 全局刷新 ====================
-        async function refreshDashboard() {
-            const [orders, staff] = await Promise.all([dbGetAll('orders'), dbGetAll('staff')]);
-            allOrders = orders;
-            allStaff = staff.length ? staff : defStaff();
-            recalcStaff();
-            renderAll();
-        }
+  // ========== 全局刷新 ==========
+  async function refreshDashboard() {
+    const [orders, staff] = await Promise.all([dbGetAll('orders'), dbGetAll('staff')]);
+    allOrders = orders; allStaff = staff.length ? staff : defStaff();
+    recalcStaff();
+    renderAll();
+  }
 
-        function renderAll() {
-            renderStaffWall();
-            renderTracks();
-            if (role === 'boss') updateRevenue();
-            updateTrackBadges();
-        }
+  function renderAll() {
+    renderStaffWall();
+    renderTracks();
+    if (role==='boss') updateRevenue();
+    updateTrackBadges();
+    // 更新手机标签激活状态
+    updateMobileTabActive();
+  }
 
-        function updateRevenue() {
-            const today = new Date().toISOString().split('T')[0];
-            const total = allOrders.filter(o => o.date === today)
-                .reduce((s, o) => s + (o.deposit || 0) + (o.extraCost || 0) + (o.depositAmount || 0), 0);
-            document.getElementById('todayRevenue').textContent = '¥' + total.toLocaleString();
-        }
+  function updateRevenue() {
+    const today = new Date().toISOString().split('T')[0];
+    const total = allOrders.filter(o=>o.date===today).reduce((s,o)=>s+(o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0),0);
+    document.getElementById('todayRevenue').textContent = '¥'+total.toLocaleString();
+  }
 
-        function updateTrackBadges() {
-            TRACKS.forEach(t => {
-                const badge = document.getElementById('badge-' + t.id);
-                if (badge) badge.textContent = allOrders.filter(o => o.currentTrack === t.id).length;
-            });
-        }
+  function updateTrackBadges() {
+    TRACKS.forEach(t=>{
+      const badge = document.getElementById('badge-'+t.id);
+      if(badge) badge.textContent = allOrders.filter(o=>o.currentTrack===t.id).length;
+      // 更新手机标签角标
+      const tabBtn = document.querySelector(`.tab-btn[data-track="${t.id}"]`);
+      if(tabBtn) tabBtn.textContent = `${t.icon}${t.name}(${allOrders.filter(o=>o.currentTrack===t.id).length})`;
+    });
+  }
 
-        // ==================== 运力墙渲染 ====================
-        function renderStaffWall() {
-            const mList = document.getElementById('makeupList');
-            const pList = document.getElementById('photoList');
-            const build = (s) => {
-                const statusText = s.status === 'idle' ? '🟢空闲' : (s.status === 'busy' ? '🟡忙碌' : '🔴超载');
-                const overload = s.status === 'overload' ? 'overload' : '';
-                return `<div class="staff-card p-2 text-xs ${overload}" id="staff-${s.id}">
-                <div class="flex justify-between items-center">
-                    <span class="font-semibold truncate">${s.name}</span>
-                    <span class="text-xs cursor-pointer font-bold px-2 py-0.5 rounded-full border"
-                        style="color: var(--green); border-color: var(--green);"
-                        onclick="toggleLeaveConfirm('${s.id}')">🟢 在岗</span>
-                </div>
-                <div class="flex justify-between mt-1"><span class="text-gray-500">${statusText}</span><span class="font-bold">${s.currentLoad}单</span></div>
-            </div>`;
-            };
-            mList.innerHTML = allStaff.filter(s => s.role === 'makeup').map(build).join('') || '<p class="text-xs text-center text-gray-400">暂无化妆师</p>';
-            pList.innerHTML = allStaff.filter(s => s.role === 'photo').map(build).join('') || '<p class="text-xs text-center text-gray-400">暂无摄影师</p>';
-        }
+  function updateMobileTabActive() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      if(btn.dataset.track === currentMobileTab) btn.classList.add('bg-green-100','text-green-700');
+      else btn.classList.remove('bg-green-100','text-green-700');
+    });
+  }
 
-        // ==================== 轨道渲染 ====================
-        function renderTracks() {
-            const container = document.getElementById('trackContainer');
-            let html = '';
-            TRACKS.forEach(track => {
-                const orders = allOrders.filter(o => o.currentTrack === track.id);
-                let sorted = [...orders];
-                if (track.key === 'selection' && settings.selectionMode === 'inStore') {
-                    sorted.sort((a, b) => a.timestamp - b.timestamp);
-                } else {
-                    sorted.sort((a, b) => b.timestamp - a.timestamp);
-                }
-                let extraHeader = '';
-                if (track.key === 'selection') {
-                    extraHeader = `
-                    <div class="mt-2 flex flex-col gap-2 text-xs bg-gray-50 rounded-lg p-2 border">
-                        <div class="flex items-center gap-2">
-                            <span class="font-semibold">模式</span>
-                            <select onchange="updateSetting('selectionMode',this.value)" class="border rounded px-1 py-0.5">
-                                <option value="inStore" ${settings.selectionMode==='inStore'?'selected':''}>店内选片</option>
-                                <option value="remote" ${settings.selectionMode==='remote'?'selected':''}>离店自选</option>
-                            </select>
-                            <span class="font-semibold ml-2">单价</span>
-                            <input type="number" value="${settings.priceStandard}" class="w-14 border rounded px-1 py-0.5" onchange="updateSetting('priceStandard',this.value)">标准
-                            <input type="number" value="${settings.pricePremium}" class="w-14 border rounded px-1 py-0.5" onchange="updateSetting('pricePremium',this.value)">超精
-                            <input type="number" value="${settings.priceCommercial}" class="w-14 border rounded px-1 py-0.5" onchange="updateSetting('priceCommercial',this.value)">商业
-                        </div>
-                    </div>`;
-                }
-                html += `
-                <div class="track-column flex-1 min-w-[130px]" data-track-id="${track.id}">
-                    <div class="track-header">
-                        <span class="font-bold text-xs">${track.icon} ${track.name}</span>
-                        <span class="track-badge" id="badge-${track.id}" style="display:inline-block;min-width:24px;height:24px;background:#1a1a2e;color:#fff;border-radius:50%;font-size:12px;line-height:24px;text-align:center;">${sorted.length}</span>
-                        ${extraHeader}
-                    </div>
-                    <div class="track-body">${sorted.map(o => buildCard(o, track)).join('')}</div>
-                </div>`;
-            });
-            container.innerHTML = html;
-        }
+  // ========== 运力墙渲染 ==========
+  function renderStaffWall() {
+    const mList = document.getElementById('makeupList'), pList = document.getElementById('photoList');
+    const build = (s) => {
+      const statusText = s.status==='idle'?'🟢空闲':(s.status==='busy'?'🟡忙碌':'🔴超载');
+      const overload = s.status==='overload'?'overload':'';
+      return `<div class="staff-card p-2 text-xs ${overload} flex-shrink-0 w-[140px] lg:w-auto" id="staff-${s.id}">
+        <div class="flex justify-between items-center"><span class="font-semibold truncate">${s.name}</span>
+          <span class="text-xs cursor-pointer font-bold px-2 py-0.5 rounded-full border ml-1" style="color:var(--green); border-color:var(--green);" onclick="toggleLeaveConfirm('${s.id}')">在岗</span>
+        </div>
+        <div class="flex justify-between mt-1"><span class="text-gray-500">${statusText}</span><span class="font-bold">${s.currentLoad}单</span></div>
+      </div>`;
+    };
+    mList.innerHTML = allStaff.filter(s=>s.role==='makeup').map(build).join('')||'<span class="text-xs text-gray-400">暂无</span>';
+    pList.innerHTML = allStaff.filter(s=>s.role==='photo').map(build).join('')||'<span class="text-xs text-gray-400">暂无</span>';
+  }
 
-        // ==================== 卡片构建 ====================
-        function buildCard(o, track) {
-            let typeTag = '';
-            if (o.type === 'makeup_only') typeTag = '<span class="text-xs bg-orange-100 text-orange-800 px-1 rounded">💄仅妆</span>';
-            else if (o.type === 'rental') typeTag = '<span class="text-xs bg-blue-100 text-blue-800 px-1 rounded">👗外借</span>';
-            else if (o.type === 'photo_only') typeTag = '<span class="text-xs bg-green-100 text-green-800 px-1 rounded">📷仅拍</span>';
+  // ========== 轨道渲染 ==========
+  function renderTracks() {
+    const container = document.getElementById('trackContainer');
+    let html = '';
+    TRACKS.forEach(track => {
+      const orders = allOrders.filter(o=>o.currentTrack===track.id);
+      let sorted = [...orders];
+      if (track.key==='selection' && settings.selectionMode==='inStore') sorted.sort((a,b)=>a.timestamp-b.timestamp);
+      else sorted.sort((a,b)=>b.timestamp-a.timestamp);
 
-            let payStatus = '';
-            if (!o.paymentMethod) {
-                payStatus = `<span class="text-copper text-xs cursor-pointer" onclick="event.stopPropagation();patchPayment('${o.id}')">💳 悬空未对账</span>`;
-            } else {
-                payStatus = `<span class="text-gray-500 text-xs">${o.paymentMethod}</span>`;
-            }
+      let extraHeader = '';
+      if (track.key==='selection') {
+        extraHeader = `
+        <div class="mt-2 flex flex-col gap-1 text-xs bg-gray-50 rounded-lg p-2 border">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold">模式</span>
+            <select onchange="updateSetting('selectionMode',this.value)" class="border rounded px-1 py-0.5 text-xs">
+              <option value="inStore" ${settings.selectionMode==='inStore'?'selected':''}>店内</option>
+              <option value="remote" ${settings.selectionMode==='remote'?'selected':''}>离店</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-1 flex-wrap">
+            <span class="font-semibold">单价</span>
+            <label class="text-gray-500 text-xs">标</label><input type="number" value="${settings.priceStandard}" class="w-12 border rounded px-1 py-0.5 text-xs" onchange="updateSetting('priceStandard',this.value)">
+            <label class="text-gray-500 text-xs">超</label><input type="number" value="${settings.pricePremium}" class="w-12 border rounded px-1 py-0.5 text-xs" onchange="updateSetting('pricePremium',this.value)">
+            <label class="text-gray-500 text-xs">商</label><input type="number" value="${settings.priceCommercial}" class="w-12 border rounded px-1 py-0.5 text-xs" onchange="updateSetting('priceCommercial',this.value)">
+          </div>
+        </div>`;
+      }
 
-            let phoneStatus = '';
-            if (!o.phone) {
-                phoneStatus = `<span class="text-copper text-xs cursor-pointer ml-2" onclick="event.stopPropagation();patchPhone('${o.id}')">✍️ 缺联系方式</span>`;
-            }
+      html += `
+      <div class="track-column flex-1 min-w-[280px] ${currentMobileTab !== track.id ? 'hidden' : ''} md:block lg:flex flex-col" data-track-id="${track.id}">
+        <div class="track-header">
+          <span class="font-bold text-xs">${track.icon} ${track.name}</span>
+          <span class="track-badge" id="badge-${track.id}" style="display:inline-block;min-width:24px;height:24px;background:#1a1a2e;color:#fff;border-radius:50%;font-size:12px;line-height:24px;text-align:center;">${sorted.length}</span>
+          ${extraHeader}
+        </div>
+        <div class="track-body">${sorted.map(o => buildCard(o, track)).join('')}</div>
+      </div>`;
+    });
+    container.innerHTML = html;
+    // 绑定卡片点击事件（用于信息补齐弹窗）
+    document.querySelectorAll('.order-card').forEach(card => {
+      card.addEventListener('click', function(e) {
+        // 如果点击的是按钮或下拉等，不触发
+        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+        const orderId = this.dataset.orderId;
+        if (orderId) openInfoPatchModal(orderId);
+      });
+    });
+  }
 
-            let wechat = '';
-            if (track.key === 'selection' && settings.selectionMode === 'remote') {
-                wechat = o.wechatAdded ? '<span class="text-green-500 text-xs">💚已加微信</span>' : `<span class="text-gray-400 text-xs cursor-pointer" onclick="event.stopPropagation();markWechat('${o.id}')">🔘未加</span>`;
-            }
+  // ========== 卡片构建 ==========
+  function buildCard(o, track) {
+    let typeTag = '';
+    if (o.type==='makeup_only') typeTag = '<span class="text-xs bg-orange-100 text-orange-800 px-1 rounded">💄仅妆</span>';
+    else if (o.type==='rental') typeTag = '<span class="text-xs bg-blue-100 text-blue-800 px-1 rounded">👗外借</span>';
+    else if (o.type==='photo_only') typeTag = '<span class="text-xs bg-green-100 text-green-800 px-1 rounded">📷仅拍</span>';
 
-            let rental = '';
-            if (o.type === 'rental' && track.key === 'selection') {
-                if (!o.rentalDepositPaid) {
-                    rental = `<div class="text-xs text-copper">⚠️押金未登记 <button class="btn-action btn-copper" onclick="event.stopPropagation();openDeposit('${o.id}')">登记</button></div>`;
-                } else {
-                    rental = `<div class="text-xs text-green-600">✅已收押金¥${o.depositAmount} ${o.rentalReturned ? '已还' : '未还'}
-                    ${!o.rentalReturned ? `<button class="btn-action btn-green ml-1" onclick="event.stopPropagation();returnRental('${o.id}')">确认归还</button>` : ''}</div>`;
-                }
-            }
+    let payStatus = o.paymentMethod ? `<span class="text-gray-500 text-xs">${o.paymentMethod}</span>` : `<span class="text-copper text-xs">💳未对账</span>`;
+    let phoneStatus = o.phone ? '' : `<span class="text-copper text-xs ml-1">✍️缺电话</span>`;
+    let nameStatus = (!o.name || o.name==='匿名散客') ? `<span class="text-copper text-xs ml-1">👤缺姓名</span>` : '';
 
-            let price = '';
-            if (track.key === 'selection' && settings.selectionMode === 'inStore') {
-                price = `
-                <div class="price-calc" onclick="event.stopPropagation()">
-                    <select onchange="setRetouch('${o.id}',this.value)" class="text-xs">
-                        <option value="standard" ${o.retouchLevel==='standard'?'selected':''}>标准¥${settings.priceStandard}</option>
-                        <option value="premium" ${o.retouchLevel==='premium'?'selected':''}>超精¥${settings.pricePremium}</option>
-                        <option value="commercial" ${o.retouchLevel==='commercial'?'selected':''}>商业¥${settings.priceCommercial}</option>
-                    </select>
-                    <button class="qty-btn" onclick="changeExtra('${o.id}',-1)">−</button><span>${o.extraPhotos}</span><button class="qty-btn" onclick="changeExtra('${o.id}',1)">+</button>
-                    <span class="font-bold text-xs ml-auto" style="color:var(--copper);">+¥${o.extraCost}</span>
-                </div>`;
-            }
+    let wechat = '';
+    if (track.key==='selection' && settings.selectionMode==='remote') {
+      wechat = o.wechatAdded ? '<span class="text-green-500 text-xs">💚已加微信</span>' : `<span class="text-gray-400 text-xs cursor-pointer" onclick="event.stopPropagation();markWechat('${o.id}')">🔘未加</span>`;
+    }
+    let rental = '';
+    if (o.type==='rental' && track.key==='selection') {
+      rental = !o.rentalDepositPaid ? `<div class="text-xs text-copper">⚠️押金未登记 <button class="btn-action btn-copper" onclick="event.stopPropagation();openDeposit('${o.id}')">登记</button></div>` : `<div class="text-xs text-green-600">✅已收押金¥${o.depositAmount} ${o.rentalReturned?'已还':'未还'} ${!o.rentalReturned?`<button class="btn-action btn-green ml-1" onclick="event.stopPropagation();returnRental('${o.id}')">归还</button>`:''}</div>`;
+    }
+    let price = '';
+    if (track.key==='selection' && settings.selectionMode==='inStore') {
+      price = `<div class="price-calc mt-2 text-xs" onclick="event.stopPropagation()">
+        <select onchange="setRetouch('${o.id}',this.value)" class="text-xs border rounded px-1 py-0.5">
+          <option value="standard" ${o.retouchLevel==='standard'?'selected':''}>标准¥${settings.priceStandard}</option>
+          <option value="premium" ${o.retouchLevel==='premium'?'selected':''}>超精¥${settings.pricePremium}</option>
+          <option value="commercial" ${o.retouchLevel==='commercial'?'selected':''}>商业¥${settings.priceCommercial}</option>
+        </select>
+        <button class="qty-btn" onclick="changeExtra('${o.id}',-1)">−</button><span class="mx-1">${o.extraPhotos}</span><button class="qty-btn" onclick="changeExtra('${o.id}',1)">+</button>
+        <span class="font-bold ml-auto" style="color:var(--copper);">+¥${o.extraCost}</span>
+      </div>`;
+    }
 
-            let assignDropdown = '';
-            if ((track.key === 'styling' && !o.makeupArtistId) || (track.key === 'shooting' && !o.photographerId)) {
-                const roleNeeded = track.key === 'styling' ? 'makeup' : 'photo';
-                const idleStaff = allStaff.filter(s => s.role === roleNeeded && s.status === 'idle');
-                if (idleStaff.length) {
-                    assignDropdown = `<select class="text-xs border rounded mt-1" onchange="assignStaff('${o.id}','${track.key}',this.value)">
-                    <option value="">选择${roleNeeded==='makeup'?'化妆师':'摄影师'}</option>
-                    ${idleStaff.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
-                </select>`;
-                } else {
-                    assignDropdown = '<span class="text-xs text-gray-400">暂无可派人员</span>';
-                }
-            }
+    let assignDropdown = '';
+    if ((track.key==='styling' && !o.makeupArtistId) || (track.key==='shooting' && !o.photographerId)) {
+      const roleNeeded = track.key==='styling'?'makeup':'photo';
+      const idleStaff = allStaff.filter(s=>s.role===roleNeeded && s.status==='idle');
+      assignDropdown = idleStaff.length ? `<select class="text-xs border rounded mt-1" onchange="assignStaff('${o.id}','${track.key}',this.value)"><option value="">指派</option>${idleStaff.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select>` : '<span class="text-xs text-gray-400">无空闲</span>';
+    }
 
-            const nextTrack = getNextTrack(track.id);
-            const canMove = checkMovePermission(o, track.id);
-            let moveBtn = '';
-            if (nextTrack && canMove) {
-                moveBtn = `<button class="btn-action btn-green mt-1" onclick="moveToNext('${o.id}')">➔ 进入${TRACKS.find(t => t.id === nextTrack).name}</button>`;
-            } else if (nextTrack && !canMove) {
-                moveBtn = `<button class="btn-action btn-disabled mt-1" disabled>需补全信息</button>`;
-            }
+    const nextTrack = getNextTrack(track.id);
+    const canMove = checkMovePermission(o, track.id);
+    let moveBtn = '';
+    if (nextTrack && canMove) moveBtn = `<button class="btn-action btn-green mt-1" onclick="event.stopPropagation();moveToNext('${o.id}')">➔ 进入${TRACKS.find(t=>t.id===nextTrack).name}</button>`;
+    else if (nextTrack && !canMove) moveBtn = `<button class="btn-action btn-disabled mt-1" disabled>需补全信息</button>`;
 
-            return `
-            <div class="order-card" id="card-${o.id}">
-                <div class="flex justify-between"><span class="channel-tag" style="background:linear-gradient(135deg,#ede9fe,#f3e8ff);color:#7c3aed;padding:2px 6px;border-radius:12px;font-size:10px;">${o.channel||'散客'}</span>${typeTag}</div>
-                <div class="font-bold text-sm mt-1">${o.flowNumber} ${o.name}</div>
-                <div class="text-xs text-gray-500">📱${o.phone||'无'} ${phoneStatus} | 💰定金¥${o.deposit} ${payStatus}</div>
-                ${wechat} ${rental} ${price} ${assignDropdown}
-                <div class="flex gap-1 mt-1">${moveBtn} ${track.key==='selection'||track.key==='delivery'?`<button class="btn-action" onclick="printOrder('${o.id}')">🖨️打印</button>`:''}</div>
-            </div>`;
-        }
+    return `
+    <div class="order-card" data-order-id="${o.id}" id="card-${o.id}">
+      <div class="flex justify-between items-start">
+        <span class="channel-tag" style="background:linear-gradient(135deg,#ede9fe,#f3e8ff);color:#7c3aed;padding:2px 6px;border-radius:12px;font-size:10px;">${o.channel||'散客'}</span>
+        ${typeTag}
+      </div>
+      <div class="font-bold text-sm mt-1">${o.flowNumber} ${o.name||'匿名'}</div>
+      <div class="text-xs text-gray-500 flex flex-wrap items-center gap-1">
+        <span>📱${o.phone||'无'}</span>${phoneStatus}${nameStatus}
+        <span>💰定金¥${o.deposit||0}</span>${payStatus}
+      </div>
+      ${wechat}${rental}${price}${assignDropdown}
+      <div class="flex flex-wrap gap-1 mt-2">
+        ${moveBtn}
+        ${(track.key==='selection'||track.key==='delivery')?`<button class="btn-action" onclick="event.stopPropagation();printOrder('${o.id}')">🖨️打印</button>`:''}
+      </div>
+    </div>`;
+  }
 
-        function getNextTrack(currentId) {
-            const idx = TRACKS.findIndex(t => t.id === currentId);
-            return idx < TRACKS.length - 1 ? TRACKS[idx + 1].id : null;
-        }
+  function getNextTrack(currentId) { const idx = TRACKS.findIndex(t=>t.id===currentId); return idx<TRACKS.length-1?TRACKS[idx+1].id:null; }
+  function checkMovePermission(o, trackId) {
+    if (trackId==='track1' && !o.paymentMethod) return false;
+    if (!o.name || o.name==='匿名散客' || !o.phone) return false; // 姓名电话必须补全
+    return true;
+  }
 
-        function checkMovePermission(o, trackId) {
-            if (trackId === 'track1') {
-                if (!o.paymentMethod) return false;
-            }
-            if (trackId === 'track2' && o.type === 'rental' && !o.rentalDepositPaid) {
-                // 服装外借在进入选衣后须登记押金，但这里简化处理
-            }
-            return true;
-        }
+  // ========== 信息补齐弹窗 ==========
+  window.openInfoPatchModal = (orderId) => {
+    const o = allOrders.find(x=>x.id===orderId);
+    if (!o) return;
+    const content = document.getElementById('customModalContent');
+    content.innerHTML = `
+      <h3 class="font-bold text-lg mb-4">📝 客户信息补全</h3>
+      <div class="space-y-3 text-sm text-left">
+        <div><label class="font-semibold block mb-1">客户姓名</label><input type="text" id="patchName" value="${o.name||''}" class="w-full px-3 py-2 border rounded"></div>
+        <div><label class="font-semibold block mb-1">联系电话</label><input type="text" id="patchPhone" value="${o.phone||''}" maxlength="11" class="w-full px-3 py-2 border rounded"></div>
+        <div><label class="font-semibold block mb-1">定金金额</label><input type="number" id="patchDeposit" value="${o.deposit||0}" class="w-full px-3 py-2 border rounded"></div>
+        <div><label class="font-semibold block mb-1">支付方式</label>
+          <select id="patchPayment" class="w-full px-3 py-2 border rounded">
+            <option value="">未选择</option>
+            <option value="微信" ${o.paymentMethod==='微信'?'selected':''}>微信</option>
+            <option value="支付宝" ${o.paymentMethod==='支付宝'?'selected':''}>支付宝</option>
+            <option value="现金" ${o.paymentMethod==='现金'?'selected':''}>现金</option>
+            <option value="刷卡" ${o.paymentMethod==='刷卡'?'selected':''}>刷卡</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 mt-4">
+        <button class="btn-action" onclick="closeModal()">取消</button>
+        <button class="btn-action btn-green" id="confirmPatch">确认锁死</button>
+      </div>
+    `;
+    document.getElementById('confirmPatch').onclick = async () => {
+      const name = document.getElementById('patchName').value.trim();
+      const phone = document.getElementById('patchPhone').value.trim();
+      const deposit = parseFloat(document.getElementById('patchDeposit').value) || 0;
+      const payment = document.getElementById('patchPayment').value;
+      if (o) {
+        o.name = name || '匿名散客';
+        o.phone = phone;
+        o.deposit = deposit;
+        o.paymentMethod = payment || null;
+        o.totalAmount = deposit + (o.extraCost||0) + (o.depositAmount||0);
+        await dbPut('orders', o);
+      }
+      closeModal();
+      refreshDashboard();
+    };
+    document.getElementById('customModal').classList.remove('hidden');
+  };
 
-        // ==================== 全局操作函数（挂载到window） ====================
-        window.moveToNext = async (orderId) => {
-            const o = allOrders.find(x => x.id === orderId);
-            if (!o) return;
-            const nextId = getNextTrack(o.currentTrack);
-            if (!nextId) return;
-            if (o.currentTrack === 'track1' && !o.paymentMethod) {
-                showModal('支付未对账', '请先选择支付方式');
-                return;
-            }
-            o.currentTrack = nextId;
-            o.timestamp = Date.now();
-            await dbPut('orders', o);
-            refreshDashboard();
-        };
+  // ========== 操作函数 ==========
+  window.moveToNext = async (orderId) => {
+    const o = allOrders.find(x=>x.id===orderId);
+    if (!o) return;
+    const nextId = getNextTrack(o.currentTrack);
+    if (!nextId) return;
+    if (o.currentTrack==='track1' && !o.paymentMethod) { showModal('支付未对账','请先选择支付方式'); return; }
+    if (!o.name || o.name==='匿名散客' || !o.phone) { showModal('信息不全','请补全客户姓名和电话'); return; }
+    o.currentTrack = nextId; o.timestamp = Date.now();
+    await dbPut('orders', o); refreshDashboard();
+  };
 
-        window.assignStaff = async (orderId, trackKey, staffId) => {
-            const o = allOrders.find(x => x.id === orderId);
-            if (!o || !staffId) return;
-            if (trackKey === 'styling') o.makeupArtistId = staffId;
-            else o.photographerId = staffId;
-            await dbPut('orders', o);
-            refreshDashboard();
-        };
+  window.assignStaff = async (orderId, trackKey, staffId) => {
+    const o = allOrders.find(x=>x.id===orderId);
+    if (!o || !staffId) return;
+    if (trackKey==='styling') o.makeupArtistId = staffId;
+    else o.photographerId = staffId;
+    await dbPut('orders', o); refreshDashboard();
+  };
 
-        window.toggleLeaveConfirm = (staffId) => {
-            const s = allStaff.find(x => x.id === staffId);
-            if (!s) return;
-            if (s.currentLoad > 0) {
-                showModal('无法下班', '该人员仍在服务中，请先完成手头订单');
-                return;
-            }
-            showModal('确认下班', `确定让 ${s.name} 下班并移除？`, 'confirm', async () => {
-                allStaff = allStaff.filter(x => x.id !== staffId);
-                await dbDelete('staff', staffId);
-                refreshDashboard();
-            });
-        };
+  window.toggleLeaveConfirm = (staffId) => {
+    const s = allStaff.find(x=>x.id===staffId);
+    if (!s) return;
+    if (s.currentLoad > 0) { showModal('无法下班','该人员仍在服务中'); return; }
+    showModal('确认下班', `确定让 ${s.name} 下班并移除？`, 'confirm', async () => {
+      allStaff = allStaff.filter(x=>x.id!==staffId);
+      await dbDelete('staff', staffId);
+      refreshDashboard();
+    });
+  };
 
-        window.patchPayment = (orderId) => {
-            const o = allOrders.find(x => x.id === orderId);
-            if (!o) return;
-            const methods = ['微信', '支付宝', '现金', '刷卡'];
-            const content = methods.map(m => `<button class="btn-action btn-green m-1" onclick="setPayment('${orderId}','${m}')">${m}</button>`).join('');
-            document.getElementById('customModal').querySelector('.modal-box').innerHTML = `<h3 class="font-bold text-lg mb-3">选择支付方式</h3><div>${content}</div>`;
-            document.getElementById('customModal').classList.remove('hidden');
-        };
-        window.setPayment = async (orderId, method) => {
-            const o = allOrders.find(x => x.id === orderId);
-            if (o) { o.paymentMethod = method; await dbPut('orders', o); }
-            closeModal();
-            refreshDashboard();
-        };
-        window.patchPhone = (orderId) => {
-            const o = allOrders.find(x => x.id === orderId);
-            if (!o) return;
-            const box = document.getElementById('customModal').querySelector('.modal-box');
-            box.innerHTML = `<h3 class="font-bold text-lg mb-3">补录联系方式</h3>
-            <input type="text" id="newPhone" class="border rounded px-2 py-1 w-full" placeholder="输入电话号码">
-            <div class="flex gap-3 mt-3 justify-center">
-                <button class="btn-action" onclick="closeModal()">取消</button>
-                <button class="btn-action btn-green" id="savePhone">保存</button>
-            </div>`;
-            document.getElementById('savePhone').onclick = async () => {
-                const phone = document.getElementById('newPhone').value;
-                if (o) { o.phone = phone; await dbPut('orders', o); }
-                closeModal();
-                refreshDashboard();
-            };
-            document.getElementById('customModal').classList.remove('hidden');
-        };
+  window.markWechat = async (orderId) => { const o = allOrders.find(x=>x.id===orderId); if(o){ o.wechatAdded=true; await dbPut('orders',o); refreshDashboard(); } };
+  window.openDeposit = (orderId) => {
+    const o = allOrders.find(x=>x.id===orderId);
+    if (!o) return;
+    const content = document.getElementById('customModalContent');
+    content.innerHTML = `<h3 class="font-bold text-lg mb-3">押金登记</h3><input type="number" id="depAmt" class="w-full border rounded px-3 py-2" placeholder="金额"><div class="flex gap-2 justify-end mt-3"><button class="btn-action" onclick="closeModal()">取消</button><button class="btn-action btn-copper" id="confirmDep">确认</button></div>`;
+    document.getElementById('confirmDep').onclick = async () => {
+      const amt = parseFloat(document.getElementById('depAmt').value)||0;
+      if (o) { o.rentalDepositPaid=true; o.depositAmount=amt; o.totalAmount+=amt; await dbPut('orders',o); }
+      closeModal(); refreshDashboard();
+    };
+    document.getElementById('customModal').classList.remove('hidden');
+  };
+  window.returnRental = async (orderId) => { const o = allOrders.find(x=>x.id===orderId); if(o){ o.rentalReturned=true; await dbPut('orders',o); refreshDashboard(); } };
+  window.setRetouch = async (orderId, level) => { const o = allOrders.find(x=>x.id===orderId); if(o){ o.retouchLevel=level; calcExtra(o); await dbPut('orders',o); refreshDashboard(); } };
+  window.changeExtra = async (orderId, delta) => { const o = allOrders.find(x=>x.id===orderId); if(o){ o.extraPhotos=Math.max(0,(o.extraPhotos||0)+delta); calcExtra(o); await dbPut('orders',o); refreshDashboard(); } };
+  function calcExtra(o) { const map={standard:settings.priceStandard,premium:settings.pricePremium,commercial:settings.priceCommercial}; o.extraCost=o.extraPhotos*(map[o.retouchLevel]||settings.priceStandard); o.totalAmount=(o.deposit||0)+o.extraCost+(o.depositAmount||0); }
 
-        window.markWechat = async (orderId) => {
-            const o = allOrders.find(x => x.id === orderId);
-            if (o) { o.wechatAdded = true; await dbPut('orders', o); refreshDashboard(); }
-        };
-        window.openDeposit = (orderId) => {
-            const o = allOrders.find(x => x.id === orderId);
-            if (!o) return;
-            const box = document.getElementById('customModal').querySelector('.modal-box');
-            box.innerHTML = `<h3 class="font-bold text-lg mb-3">押金登记</h3>
-            <input type="number" id="depAmt" class="border rounded px-2 py-1 w-full" placeholder="金额">
-            <div class="flex gap-3 mt-3 justify-center">
-                <button class="btn-action" onclick="closeModal()">取消</button>
-                <button class="btn-action btn-copper" id="confirmDep">确认</button>
-            </div>`;
-            document.getElementById('confirmDep').onclick = async () => {
-                const amt = parseFloat(document.getElementById('depAmt').value) || 0;
-                if (o) { o.rentalDepositPaid = true; o.depositAmount = amt; o.totalAmount += amt; await dbPut('orders', o); }
-                closeModal();
-                refreshDashboard();
-            };
-            document.getElementById('customModal').classList.remove('hidden');
-        };
-        window.returnRental = async (orderId) => {
-            const o = allOrders.find(x => x.id === orderId);
-            if (o) { o.rentalReturned = true; await dbPut('orders', o); refreshDashboard(); }
-        };
-        window.setRetouch = async (orderId, level) => {
-            const o = allOrders.find(x => x.id === orderId);
-            if (o) { o.retouchLevel = level; calcExtra(o); await dbPut('orders', o); refreshDashboard(); }
-        };
-        window.changeExtra = async (orderId, delta) => {
-            const o = allOrders.find(x => x.id === orderId);
-            if (o) { o.extraPhotos = Math.max(0, (o.extraPhotos || 0) + delta); calcExtra(o); await dbPut('orders', o); refreshDashboard(); }
-        };
-        function calcExtra(o) {
-            const map = { standard: settings.priceStandard, premium: settings.pricePremium, commercial: settings.priceCommercial };
-            o.extraCost = o.extraPhotos * (map[o.retouchLevel] || settings.priceStandard);
-            o.totalAmount = (o.deposit || 0) + o.extraCost + (o.depositAmount || 0);
-        }
+  window.updateSetting = async (key, val) => {
+    settings[key] = isNaN(parseFloat(val)) ? val : parseFloat(val);
+    await dbPut('settings', { key, value: settings[key] });
+    allOrders.forEach(o => calcExtra(o));
+    await Promise.all(allOrders.map(o => dbPut('orders', o)));
+    refreshDashboard();
+  };
 
-        window.updateSetting = async (key, val) => {
-            const numVal = parseFloat(val);
-            settings[key] = isNaN(numVal) ? val : numVal;
-            await dbPut('settings', { key: key, value: settings[key] });
-            // 重新计算所有订单费用
-            allOrders.forEach(o => calcExtra(o));
-            await Promise.all(allOrders.map(o => dbPut('orders', o)));
-            refreshDashboard();
-        };
+  window.addStaff = async (roleType) => {
+    let name = prompt('请输入新名字：');
+    if (!name) return;
+    // 自动前缀
+    if (roleType === 'makeup' && !name.startsWith('化妆师·')) name = '化妆师·' + name;
+    if (roleType === 'photo' && !name.startsWith('摄影师·')) name = '摄影师·' + name;
+    const s = { id:'staff_'+Date.now(), name, role:roleType, status:'idle', currentLoad:0 };
+    await dbPut('staff', s);
+    refreshDashboard();
+  };
 
-        window.addStaff = async (roleType) => {
-            const name = prompt('请输入新名字：');
-            if (!name) return;
-            const s = {
-                id: 'staff_' + Date.now(),
-                name: name.trim(),
-                role: roleType,
-                status: 'idle',
-                currentLoad: 0
-            };
-            await dbPut('staff', s);
-            refreshDashboard();
-        };
+  window.handleQuickInput = () => {
+    const raw = document.getElementById('quickInput').value.trim();
+    if (!raw) return;
+    const tokens = raw.split(/\s+/).filter(Boolean);
+    let channel='散客', payment=null, phone='', deposit=0, name='匿名散客';
+    const payKeywords = ['微信','支付宝','现金','刷卡'];
+    for (const kw of payKeywords) {
+      const idx = tokens.indexOf(kw);
+      if (idx !== -1) { payment = kw; tokens.splice(idx, 1); break; }
+    }
+    if (tokens.length) {
+      const last = tokens[tokens.length-1];
+      if (/^\d+$/.test(last) || /^1[3-9]\d{9}$/.test(last)) { /* 不作为渠道 */ }
+      else { channel = last; tokens.pop(); }
+      for (const t of tokens) {
+        if (!phone && /^1[3-9]\d{9}$/.test(t)) phone = t;
+        else if (!deposit && /^\d+$/.test(t) && parseInt(t)>0) deposit = parseInt(t);
+        else { if (name==='匿名散客') name = t; else name += t; }
+      }
+    }
+    if (!name || name==='匿名散客') name = tokens.join('') || '匿名散客';
+    flowCounter++;
+    const today = new Date().toISOString().split('T')[0];
+    const newOrder = {
+      id:'order_'+Date.now(), flowNumber:'#'+String(flowCounter).padStart(3,'0'),
+      name, phone, deposit, channel, paymentMethod:payment, type:'comprehensive',
+      currentTrack:'track1', timestamp:Date.now(), wechatAdded:false,
+      makeupArtistId:null, photographerId:null, depositAmount:0, rentalReturned:false,
+      extraPhotos:0, retouchLevel:'standard', extraCost:0, totalAmount:deposit,
+      date:today, rentalDepositPaid:false
+    };
+    dbPut('orders', newOrder).then(() => { refreshDashboard(); document.getElementById('quickInput').value = ''; });
+  };
 
-        window.handleQuickInput = () => {
-            const raw = document.getElementById('quickInput').value.trim();
-            if (!raw) return;
-            const tokens = raw.split(/\s+/).filter(Boolean);
-            let channel = '散客', payment = null, phone = '', deposit = 0, name = '匿名散客';
-            const payKeywords = ['微信', '支付宝', '现金', '刷卡'];
-            for (const kw of payKeywords) {
-                const idx = tokens.indexOf(kw);
-                if (idx !== -1) {
-                    payment = kw;
-                    tokens.splice(idx, 1);
-                    break;
-                }
-            }
-            if (tokens.length) {
-                const last = tokens[tokens.length - 1];
-                // 判断最后一个词是否为纯数字或电话，否则作为渠道
-                if (/^\d+$/.test(last) || /^1[3-9]\d{9}$/.test(last)) {
-                    // 可能是电话或定金，不作为渠道，渠道保持散客
-                } else {
-                    channel = last;
-                    tokens.pop();
-                }
-                for (const t of tokens) {
-                    if (!phone && /^1[3-9]\d{9}$/.test(t)) {
-                        phone = t;
-                    } else if (!deposit && /^\d+$/.test(t) && parseInt(t) > 0) {
-                        deposit = parseInt(t);
-                    } else {
-                        if (name === '匿名散客') name = t;
-                        else name += t;
-                    }
-                }
-            }
-            if (!name || name === '匿名散客') name = tokens.join('') || '匿名散客';
-            flowCounter++;
-            const today = new Date().toISOString().split('T')[0];
-            const newOrder = {
-                id: 'order_' + Date.now(),
-                flowNumber: '#' + String(flowCounter).padStart(3, '0'),
-                name, phone, deposit, channel, paymentMethod: payment,
-                type: 'comprehensive',
-                currentTrack: 'track1',
-                timestamp: Date.now(),
-                wechatAdded: false,
-                makeupArtistId: null,
-                photographerId: null,
-                depositAmount: 0,
-                rentalReturned: false,
-                extraPhotos: 0,
-                retouchLevel: 'standard',
-                extraCost: 0,
-                totalAmount: deposit,
-                date: today,
-                rentalDepositPaid: false
-            };
-            dbPut('orders', newOrder).then(() => {
-                refreshDashboard();
-                document.getElementById('quickInput').value = '';
-            });
-        };
+  window.openChannelReport = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const orders = allOrders.filter(o=>o.date===today);
+    const payStats = {}, chanStats = {};
+    orders.forEach(o => {
+      const pm = o.paymentMethod || '未知';
+      payStats[pm] = (payStats[pm]||0) + (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0);
+      const ch = o.channel||'散客';
+      if(!chanStats[ch]) chanStats[ch]={count:0,total:0};
+      chanStats[ch].count++; chanStats[ch].total += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0);
+    });
+    let payHtml='', chanHtml='';
+    for(const [k,v] of Object.entries(payStats)) payHtml+=`<tr><td class="p-1">${k}</td><td class="text-right">¥${v.toLocaleString()}</td></tr>`;
+    for(const [k,v] of Object.entries(chanStats)) chanHtml+=`<tr><td class="p-1">${k}</td><td class="text-right">${v.count}单</td><td class="text-right">¥${v.total.toLocaleString()}</td></tr>`;
+    const content = document.getElementById('customModalContent');
+    content.innerHTML = `<h3 class="font-bold text-lg mb-3">📋 今日对账</h3>
+      <p class="font-semibold text-sm">支付通道</p><table class="w-full text-xs">${payHtml||'<tr><td colspan="2">无</td></tr>'}</table>
+      <p class="font-semibold text-sm mt-3">客源渠道</p><table class="w-full text-xs">${chanHtml||'<tr><td colspan="3">无</td></tr>'}</table>
+      <button class="btn-action btn-green mt-3" onclick="closeModal()">关闭</button>`;
+    document.getElementById('customModal').classList.remove('hidden');
+  };
 
-        window.openChannelReport = () => {
-            const today = new Date().toISOString().split('T')[0];
-            const orders = allOrders.filter(o => o.date === today);
-            const payStats = {}, chanStats = {};
-            orders.forEach(o => {
-                const pm = o.paymentMethod || '未知';
-                payStats[pm] = (payStats[pm] || 0) + (o.deposit || 0) + (o.extraCost || 0) + (o.depositAmount || 0);
-                const ch = o.channel || '散客';
-                if (!chanStats[ch]) chanStats[ch] = { count: 0, total: 0 };
-                chanStats[ch].count++;
-                chanStats[ch].total += (o.deposit || 0) + (o.extraCost || 0) + (o.depositAmount || 0);
-            });
-            let payHtml = '', chanHtml = '';
-            for (const [k, v] of Object.entries(payStats)) {
-                payHtml += `<tr><td class="text-left">${k}</td><td class="text-right">¥${v.toLocaleString()}</td></tr>`;
-            }
-            for (const [k, v] of Object.entries(chanStats)) {
-                chanHtml += `<tr><td class="text-left">${k}</td><td class="text-right">${v.count}单</td><td class="text-right">¥${v.total.toLocaleString()}</td></tr>`;
-            }
-            const box = document.getElementById('customModal').querySelector('.modal-box');
-            box.innerHTML = `
-            <h3 class="font-bold text-lg mb-3">📋 今日对账报表</h3>
-            <p class="font-semibold text-sm">支付通道实收</p>
-            <table class="w-full text-xs mb-3">${payHtml || '<tr><td colspan="2" class="text-gray-400">暂无数据</td></tr>'}</table>
-            <p class="font-semibold text-sm">客源渠道统计</p>
-            <table class="w-full text-xs">${chanHtml || '<tr><td colspan="3" class="text-gray-400">暂无数据</td></tr>'}</table>
-            <button class="btn-action btn-green mt-3" onclick="closeModal()">关闭</button>`;
-            document.getElementById('customModal').classList.remove('hidden');
-        };
+  window.openCallModal = () => {
+    const content = document.getElementById('customModalContent');
+    content.innerHTML = `<h3 class="font-bold text-lg mb-3">📣 呼叫外部兼职</h3>
+      <div class="space-y-3 text-sm"><div><label>工费</label><input id="basePay" value="200" class="w-full border rounded px-3 py-2"></div>
+      <div><label>风格</label><select id="styleSelect" class="w-full border rounded px-3 py-2">
+        <optgroup label="化妆"><option>傣族重工</option><option>敦煌飞天</option><option>苗族银饰</option><option>大唐古风</option><option>清宫旗头</option><option>西域公主</option><option>战国袍</option><option>现代高奢</option></optgroup>
+        <optgroup label="摄影"><option>暮光夜景</option><option>日系复古</option><option>新中式国潮</option><option>纪实情绪</option><option>法式浪漫</option><option>纪实旅拍</option><option>高级大片</option></optgroup>
+      </select></div>
+      <div class="flex items-center gap-2"><input type="checkbox" id="commToggle" checked> <label>提成</label></div>
+      <div><label>提成%</label><input id="commPercent" value="20" class="w-full border rounded px-3 py-2"></div></div>
+      <div class="flex gap-2 justify-end mt-4"><button class="btn-action" onclick="closeModal()">取消</button><button class="btn-action btn-copper" onclick="confirmCall()">发布</button></div>`;
+    document.getElementById('customModal').classList.remove('hidden');
+  };
+  window.confirmCall = () => {
+    const basePay = document.getElementById('basePay')?.value || '200';
+    const style = document.getElementById('styleSelect')?.value || '';
+    const comm = document.getElementById('commToggle')?.checked;
+    const per = document.getElementById('commPercent')?.value || '20';
+    closeModal();
+    showModal('发布成功', `已发布：${style}，工费¥${basePay}，${comm?`提成${per}%`:''}。提成仅接单后显示。`);
+  };
 
-        window.openCallModal = () => {
-            const box = document.getElementById('customModal').querySelector('.modal-box');
-            box.innerHTML = `
-            <h3 class="font-bold text-lg mb-3">📣 一键呼叫外部兼职</h3>
-            <div class="space-y-3 text-sm">
-                <div><label class="font-semibold">基础工费</label><input type="number" id="basePay" value="200" class="w-full px-3 py-2 border rounded"></div>
-                <div><label class="font-semibold">工种风格</label>
-                    <select id="styleSelect" class="w-full px-3 py-2 border rounded">
-                        <optgroup label="化妆造型">
-                            <option>傣族重工</option><option>敦煌飞天</option><option>苗族银饰</option><option>大唐古风</option>
-                            <option>清宫旗头</option><option>西域公主</option><option>战国袍</option><option>现代高奢</option>
-                        </optgroup>
-                        <optgroup label="摄影风格">
-                            <option>暮光夜景</option><option>日系复古</option><option>新中式国潮</option><option>纪实情绪</option>
-                            <option>法式浪漫</option><option>纪实旅拍</option><option>高级大片</option>
-                        </optgroup>
-                    </select>
-                </div>
-                <div class="flex items-center gap-2"><input type="checkbox" id="commToggle" checked> <label>二消提成</label></div>
-                <div><label>店员提成%</label><input type="number" id="commPercent" value="20" class="w-full px-3 py-2 border rounded"></div>
-            </div>
-            <div class="flex gap-2 justify-end mt-4">
-                <button class="btn-action" onclick="closeModal()">取消</button>
-                <button class="btn-action btn-copper" onclick="confirmCall()">确认发布</button>
-            </div>`;
-            document.getElementById('customModal').classList.remove('hidden');
-        };
-        window.confirmCall = () => {
-            showModal('发布成功', '兼职呼叫已发布，提成比例仅接单成功后定向显示');
-        };
+  window.printOrder = (orderId) => {
+    const o = allOrders.find(x=>x.id===orderId); if(!o) return;
+    const level = {standard:'标准精修',premium:'超精修',commercial:'商业精修'};
+    document.getElementById('printArea').innerHTML = `<div style="font-family:'PingFang SC','Microsoft YaHei',sans-serif;"><h3 style="text-align:center;border-bottom:2px solid #000;">旅拍档期派 · 双联单据</h3><table class="print-table"><tr><td><b>流水号</b></td><td>${o.flowNumber}</td><td><b>渠道</b></td><td>${o.channel}</td></tr><tr><td><b>客户</b></td><td>${o.name}</td><td><b>电话</b></td><td>${o.phone}</td></tr><tr><td><b>精修</b></td><td>${level[o.retouchLevel]}</td><td><b>加选</b></td><td>${o.extraPhotos}张</td></tr><tr><td><b>加选费</b></td><td>¥${o.extraCost}</td><td><b>押金</b></td><td>¥${o.depositAmount||0}</td></tr><tr><td><b>总金额</b></td><td>¥${o.totalAmount}</td><td><b>状态</b></td><td>${o.currentTrack==='track6'?'已结算':'进行中'}</td></tr></table><div style="margin-top:12px;display:flex;justify-content:space-between;"><span>选片师：________</span><span>客户：________</span></div></div>`;
+    document.getElementById('printArea').style.display = 'block';
+    setTimeout(() => { window.print(); setTimeout(() => document.getElementById('printArea').style.display = 'none', 500); }, 200);
+  };
 
-        window.printOrder = (orderId) => {
-            const o = allOrders.find(x => x.id === orderId);
-            if (!o) return;
-            const level = { standard: '标准精修', premium: '超精修', commercial: '商业精修' };
-            document.getElementById('printArea').innerHTML = `
-            <div style="font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
-                <h3 style="text-align:center;border-bottom:2px solid #000;padding-bottom:6px;">旅拍档期派 · 双联单据</h3>
-                <table class="print-table">
-                    <tr><td><b>流水号</b></td><td>${o.flowNumber}</td><td><b>渠道</b></td><td>${o.channel||'散客'}</td></tr>
-                    <tr><td><b>客户</b></td><td>${o.name}</td><td><b>电话</b></td><td>${o.phone||'—'}</td></tr>
-                    <tr><td><b>精修</b></td><td>${level[o.retouchLevel]}</td><td><b>加选</b></td><td>${o.extraPhotos}张</td></tr>
-                    <tr><td><b>加选费</b></td><td>¥${o.extraCost}</td><td><b>押金</b></td><td>¥${o.depositAmount||0}</td></tr>
-                    <tr><td><b>总金额</b></td><td style="font-weight:bold;">¥${o.totalAmount}</td><td><b>状态</b></td><td>${o.currentTrack==='track6'?'✅已结算':'🔄进行中'}</td></tr>
-                </table>
-                <div style="margin-top:12px;display:flex;justify-content:space-between;">
-                    <span>选片师：<span style="display:inline-block;width:100px;border-bottom:1px solid #000;"></span></span>
-                    <span>客户：<span style="display:inline-block;width:100px;border-bottom:1px solid #000;"></span></span>
-                </div>
-            </div>`;
-            document.getElementById('printArea').style.display = 'block';
-            setTimeout(() => { window.print(); setTimeout(() => document.getElementById('printArea').style.display = 'none', 500); }, 200);
-        };
+  // 手机标签切换
+  document.getElementById('mobileTabs').addEventListener('click', (e) => {
+    if (e.target.classList.contains('tab-btn')) {
+      currentMobileTab = e.target.dataset.track;
+      renderTracks(); // 重新渲染轨道区以显示/隐藏
+      updateMobileTabActive();
+    }
+  });
 
-        // ==================== 初始化 ====================
-        (async () => {
-            await openDB();
-            await loadData();
-            const saved = sessionStorage.getItem('role');
-            if (saved === 'boss' || saved === 'staff') {
-                role = saved;
-                document.getElementById('authOverlay').classList.add('hidden');
-                applyRole();
-            }
-            document.getElementById('quickInput').addEventListener('keydown', e => {
-                if (e.key === 'Enter') handleQuickInput();
-            });
-            refreshDashboard();
-        })();
-    })();
+  // 初始化
+  (async () => {
+    await openDB();
+    await loadData();
+    const saved = sessionStorage.getItem('role');
+    if (saved==='boss'||saved==='staff') { role=saved; document.getElementById('authOverlay').classList.add('hidden'); applyRole(); }
+    document.getElementById('quickInput').addEventListener('keydown', e => { if(e.key==='Enter') handleQuickInput(); });
+    refreshDashboard();
+  })();
+})();
 </script>
 </body>
 </html>
