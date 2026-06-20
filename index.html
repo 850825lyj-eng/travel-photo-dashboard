@@ -1,1716 +1,721 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>旅拍档期派 · 商家控制台</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-    <style>
-        :root {
-            --bg: #F8F9FA;
-            --card: #FFFFFF;
-            --border: #E2E8F0;
-            --green: #00C853;
-            --yellow: #FFE100;
-            --copper: #D84315;
-            --text: #1a1a2e;
-            --text-secondary: #5a6a7e;
-            --glass: rgba(255, 255, 255, 0.78);
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
-            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
-            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.05);
-            --shadow-glow-green: 0 0 20px rgba(0, 200, 83, 0.35), 0 0 6px rgba(0, 200, 83, 0.2);
-            --shadow-glow-yellow: 0 0 22px rgba(255, 225, 0, 0.5), 0 0 8px rgba(255, 225, 0, 0.3);
-            --radius-sm: 10px;
-            --radius-md: 14px;
-            --radius-lg: 20px;
-            --transition-jelly: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-            --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .topnav-glass {
-            background: var(--glass);
-            backdrop-filter: blur(20px) saturate(160%);
-            -webkit-backdrop-filter: blur(20px) saturate(160%);
-            border-bottom: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            z-index: 100;
-            position: relative;
-        }
-        .staff-wall {
-            background: var(--card);
-            border-right: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            z-index: 50;
-        }
-        .staff-card {
-            background: var(--bg);
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm);
-            transition: all var(--transition-smooth);
-            cursor: default;
-            position: relative;
-        }
-        .staff-card.idle-highlight {
-            border-color: var(--green) !important;
-            box-shadow: var(--shadow-glow-green) !important;
-            background: #f0fdf6 !important;
-            animation: pulseGreen 1.2s ease-in-out infinite;
-        }
-        .staff-card.overload-warn {
-            border-color: var(--yellow) !important;
-            box-shadow: var(--shadow-glow-yellow) !important;
-            animation: breatheYellow 0.7s ease-in-out infinite;
-        }
-        @keyframes pulseGreen {
-            0%,
-            100% {
-                box-shadow: 0 0 12px rgba(0, 200, 83, 0.25), 0 0 3px rgba(0, 200, 83, 0.15);
-            }
-            50% {
-                box-shadow: 0 0 28px rgba(0, 200, 83, 0.5), 0 0 10px rgba(0, 200, 83, 0.3);
-            }
-        }
-        @keyframes breatheYellow {
-            0%,
-            100% {
-                box-shadow: 0 0 10px rgba(255, 225, 0, 0.3), 0 0 4px rgba(255, 225, 0, 0.2);
-                border-color: #ffe100;
-            }
-            50% {
-                box-shadow: 0 0 28px rgba(255, 225, 0, 0.7), 0 0 14px rgba(255, 200, 0, 0.5);
-                border-color: #ffc107;
-            }
-        }
-        .track-column {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-            transition: all var(--transition-smooth);
-            position: relative;
-        }
-        .track-column.drag-over {
-            border-color: var(--green) !important;
-            box-shadow: var(--shadow-glow-green) !important;
-            background: #fafffb !important;
-        }
-        .track-column.track-disabled {
-            opacity: 0.45;
-            pointer-events: none;
-            background: #f0f0f0 !important;
-            border-style: dashed !important;
-        }
-        .track-header {
-            flex-shrink: 0;
-            padding: 12px 10px 8px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            background: var(--card);
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            z-index: 2;
-        }
-        .track-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 26px;
-            height: 26px;
-            border-radius: 999px;
-            background: #1a1a2e;
-            color: #fff;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.3px;
-            padding: 0 8px;
-            margin-left: 4px;
-        }
-        .track-dot {
-            display: inline-block;
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: var(--green);
-            margin-right: 6px;
-            box-shadow: 0 0 8px rgba(0, 200, 83, 0.5);
-        }
-        .track-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px 6px;
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-            min-height: 0;
-            scroll-behavior: smooth;
-        }
-        .track-body::-webkit-scrollbar {
-            width: 3px;
-        }
-        .track-body::-webkit-scrollbar-thumb {
-            background: #d1d5db;
-            border-radius: 10px;
-        }
-        .track-body::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .order-card {
-            background: #fff;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 10px 12px;
-            cursor: grab;
-            box-shadow: var(--shadow-sm);
-            transition: all var(--transition-jelly);
-            position: relative;
-            flex-shrink: 0;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-        .order-card:active {
-            cursor: grabbing;
-        }
-        .order-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-1px);
-        }
-        .order-card.dragging {
-            opacity: 0.55;
-            transform: scale(0.94);
-            box-shadow: var(--shadow-lg);
-            border-style: dashed;
-            cursor: grabbing;
-        }
-        .order-card.drop-bounce {
-            animation: jellyPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .order-card.overload-card {
-            border-color: var(--yellow) !important;
-            animation: breatheYellowCard 0.7s ease-in-out infinite;
-        }
-        @keyframes jellyPop {
-            0% {
-                transform: scale(0.88);
-                opacity: 0.5;
-            }
-            40% {
-                transform: scale(1.05);
-                opacity: 1;
-            }
-            70% {
-                transform: scale(0.96);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        @keyframes breatheYellowCard {
-            0%,
-            100% {
-                box-shadow: 0 0 6px rgba(255, 225, 0, 0.25);
-            }
-            50% {
-                box-shadow: 0 0 20px rgba(255, 225, 0, 0.6), 0 0 8px rgba(255, 180, 0, 0.4);
-            }
-        }
-        .channel-tag {
-            display: inline-block;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            padding: 3px 8px;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #ede9fe, #f3e8ff);
-            color: #7c3aed;
-            margin-bottom: 4px;
-        }
-        .type-tag {
-            display: inline-block;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 6px;
-            letter-spacing: 0.4px;
-        }
-        .type-tag.makeup {
-            background: #fff3e0;
-            color: #e65100;
-            border: 1px solid #ffcc80;
-        }
-        .type-tag.rental {
-            background: #e3f2fd;
-            color: #0d47a1;
-            border: 1px solid #90caf9;
-        }
-        .type-tag.photo {
-            background: #e8f5e9;
-            color: #1b5e20;
-            border: 1px solid #a5d6a7;
-        }
-        .btn-action {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 5px 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: #fff;
-            cursor: pointer;
-            transition: all var(--transition-smooth);
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-        }
-        .btn-action:hover {
-            background: #f9fafb;
-            border-color: #cbd5e1;
-        }
-        .btn-action.btn-green {
-            background: #e8f5e9;
-            border-color: #a5d6a7;
-            color: #1b5e20;
-        }
-        .btn-action.btn-green:hover {
-            background: #c8e6c9;
-            border-color: #66bb6a;
-        }
-        .btn-action.btn-copper {
-            background: #fbe9e7;
-            border-color: #ffab91;
-            color: #bf360c;
-        }
-        .btn-action.btn-copper:hover {
-            background: #ffccbc;
-            border-color: #ff8a65;
-        }
-        .btn-action.btn-print {
-            background: #f5f5f5;
-            border-color: #bdbdbd;
-            color: #424242;
-        }
-        .btn-action.btn-print:hover {
-            background: #eeeeee;
-            border-color: #9e9e9e;
-        }
-        .btn-action.btn-disabled {
-            opacity: 0.4;
-            pointer-events: none;
-            background: #eee;
-        }
-        .price-calc {
-            background: #fafafa;
-            border-radius: 10px;
-            padding: 10px;
-            margin-top: 8px;
-            border: 1px dashed #e0e0e0;
-            font-size: 11px;
-        }
-        .price-calc select {
-            font-size: 11px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            background: #fff;
-        }
-        .price-calc .qty-btn {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            border: 1.5px solid #ccc;
-            background: #fff;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 700;
-            line-height: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all var(--transition-smooth);
-        }
-        .price-calc .qty-btn:hover {
-            background: #f0f0f0;
-            border-color: #999;
-        }
-        .price-calc .qty-num {
-            font-weight: 700;
-            font-size: 15px;
-            min-width: 28px;
-            text-align: center;
-            display: inline-block;
-        }
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.35);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease;
-        }
-        .modal-box {
-            background: #fff;
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            box-shadow: var(--shadow-lg);
-            max-width: 640px;
-            width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        @media print {
-            body * {
-                visibility: hidden !important;
-            }
-            #printArea,
-            #printArea * {
-                visibility: visible !important;
-            }
-            #printArea {
-                position: fixed !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                max-width: 297mm !important;
-                min-height: 190mm !important;
-                max-height: 210mm !important;
-                padding: 8mm 10mm !important;
-                background: #fff !important;
-                z-index: 99999 !important;
-                font-size: 10px !important;
-                color: #000 !important;
-                overflow: hidden !important;
-                page-break-after: avoid !important;
-            }
-            #printArea .print-table {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 10px;
-            }
-            #printArea .print-table td,
-            #printArea .print-table th {
-                border: 0.5px solid #999;
-                padding: 4px 6px;
-                text-align: left;
-            }
-            #printArea .print-signature {
-                display: inline-block;
-                width: 100px;
-                border-bottom: 1px solid #000;
-                margin: 0 12px;
-            }
-            @page {
-                size: A4 landscape;
-                margin: 2mm;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>旅拍档期派 · 商家控制台</title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <style>
+    :root {
+      --bg: #F8F9FA;
+      --card: #FFFFFF;
+      --border: #E2E8F0;
+      --green: #00C853;
+      --yellow: #FFE100;
+      --copper: #D84315;
+      --text: #1a1a2e;
+      --glass: rgba(255, 255, 255, 0.78);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.05);
+      --shadow-glow-green: 0 0 20px rgba(0, 200, 83, 0.35), 0 0 6px rgba(0, 200, 83, 0.2);
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .topnav-glass {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      z-index: 100;
+    }
+    .staff-wall {
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      z-index: 50;
+    }
+    .staff-card {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: all 0.25s;
+      position: relative;
+    }
+    .staff-card.overload-warn {
+      border-color: var(--yellow) !important;
+      animation: breatheYellow 0.7s infinite;
+    }
+    @keyframes breatheYellow {
+      0%,100%{ box-shadow: 0 0 10px rgba(255,225,0,0.3); border-color: #ffe100; }
+      50%{ box-shadow: 0 0 28px rgba(255,225,0,0.7); border-color: #ffc107; }
+    }
+    .track-column {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      transition: 0.2s;
+    }
+    .track-column.drag-over {
+      border-color: var(--green) !important;
+      background: #fafffb !important;
+    }
+    .track-column.track-disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      background: #f0f0f0 !important;
+      border-style: dashed !important;
+    }
+    .track-header {
+      flex-shrink: 0;
+      padding: 12px 8px 8px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--card);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      z-index: 2;
+    }
+    .track-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: #1a1a2e;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 0 8px;
+      margin-left: 4px;
+    }
+    .track-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-height: 0;
+    }
+    .order-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      cursor: grab;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+    .order-card:active { cursor: grabbing; }
+    .order-card.dragging { opacity: 0.55; transform: scale(0.94); }
+    .btn-action {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+    .btn-action.btn-green { background: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
+    .btn-action.btn-copper { background: #fbe9e7; border-color: #ffab91; color: #bf360c; }
+    .btn-action.btn-disabled { opacity: 0.4; pointer-events: none; background: #eee; }
+    .price-calc {
+      background: #fafafa;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 8px;
+      border: 1px dashed #e0e0e0;
+      font-size: 11px;
+    }
+    .qty-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      max-width: 640px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    @media print {
+      body * { visibility: hidden !important; }
+      #printArea, #printArea * { visibility: visible !important; }
+      #printArea {
+        position: fixed !important;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-width: 297mm;
+        min-height: 190mm;
+        max-height: 210mm;
+        padding: 8mm 10mm;
+        background: #fff;
+        z-index: 99999;
+        font-size: 10px;
+        color: #000;
+      }
+      #printArea .print-table { width: 100%; border-collapse: collapse; }
+      #printArea .print-table td { border: 0.5px solid #999; padding: 4px 6px; }
+      @page { size: A4 landscape; margin: 2mm; }
+    }
+  </style>
 </head>
 <body class="h-screen flex flex-col">
 
-    <!-- ==================== 登录拦截遮罩 ==================== -->
-    <div id="authOverlay" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/80 backdrop-blur-xl">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-80 text-center">
-            <div class="text-3xl font-bold mb-2" style="color:var(--green);">旅拍档期派</div>
-            <div class="text-xs text-gray-400 mb-6">商家控制台</div>
-            <input type="password" id="passwordInput" placeholder="请输入密码" class="w-full px-4 py-3 border rounded-xl mb-4 text-sm outline-none focus:border-green-400">
-            <button id="loginBtn" class="w-full py-3 rounded-xl text-white font-bold text-sm transition hover:shadow-lg" style="background:var(--green);">进入控制台</button>
-            <p class="text-xs text-gray-400 mt-4">员工密码: staff888 ｜ 老板密码: boss999</p>
-        </div>
+  <!-- 登录遮罩 -->
+  <div id="authOverlay" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/80 backdrop-blur-xl">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-80 text-center">
+      <div class="text-3xl font-bold mb-2" style="color:var(--green);">旅拍档期派</div>
+      <div class="text-xs text-gray-400 mb-6">商家控制台</div>
+      <input type="password" id="passwordInput" placeholder="请输入密码" class="w-full px-4 py-3 border rounded-xl mb-4 text-sm outline-none">
+      <button id="loginBtn" class="w-full py-3 rounded-xl text-white font-bold" style="background:var(--green);">进入控制台</button>
+      <p class="text-xs text-gray-400 mt-4">staff888(员工) / boss999(老板)</p>
     </div>
+  </div>
 
-    <!-- ==================== 顶部导航 ==================== -->
-    <header class="topnav-glass flex items-center justify-between px-5 py-3 flex-shrink-0 gap-4 flex-wrap">
-        <div class="flex items-center gap-3 flex-shrink-0">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-extrabold text-sm"
-            style="background:linear-gradient(135deg,#00C853,#00a844); box-shadow:0 4px 14px rgba(0,200,83,0.35);">
-            派
-        </div>
-        <div>
-            <h1 class="text-base font-bold tracking-tight text-gray-900 leading-tight">旅拍档期派 · 商家控制台</h1>
-            <p class="text-xs text-gray-500 tracking-wide">LIVE SCHEDULING DASHBOARD</p>
-        </div>
+  <!-- 顶部导航 -->
+  <header class="topnav-glass flex items-center justify-between px-5 py-3 flex-shrink-0 gap-4 flex-wrap">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-extrabold" style="background:linear-gradient(135deg,#00C853,#00a844);">派</div>
+      <div>
+        <h1 class="text-base font-bold text-gray-900">旅拍档期派 · 商家控制台</h1>
+        <p class="text-xs text-gray-500">LIVE SCHEDULING</p>
+      </div>
     </div>
-
-    <!-- 呼叫兼职按钮（样式修改：流光白背景、极光黄边框） -->
-    <div class="flex items-center gap-4 flex-shrink-0">
-        <button onclick="openCallPartTimer()" class="px-4 py-2 rounded-xl font-bold shadow-md hover:shadow-lg transition text-sm flex items-center justify-center" style="background:#fff; border:2px solid var(--yellow); color:#1a1a2e;">一键呼叫外部兼职</button>
+    <button onclick="openCallPartTimer()" class="px-4 py-2 rounded-xl font-bold shadow-md text-sm flex items-center justify-center" style="background:#fff; border:2px solid var(--yellow); color:#1a1a2e;">一键呼叫外部兼职</button>
+    <div class="flex items-center gap-3">
+      <div class="text-right"><span class="text-xs text-gray-500 block">今日营业额</span><span class="text-2xl font-extrabold" style="color:var(--green);" id="todayRevenue">¥0</span></div>
+      <button onclick="openChannelManager()" id="channelBtn" class="btn-action">📋 渠道</button>
+      <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-500 underline">退出</button>
     </div>
-
-    <div class="flex items-center gap-4 flex-shrink-0">
-        <div class="text-right" id="revenueDisplay">
-            <span class="text-xs text-gray-500 block">今日实时营业额</span>
-            <span class="text-2xl font-extrabold tracking-tight" style="color:var(--green);" id="todayRevenue">¥0</span>
-        </div>
-        <!-- 设置按钮已移除 -->
-        <button onclick="openChannelManager()" id="channelBtn" class="btn-action text-xs px-3 py-2 rounded-lg" title="客源渠道">📋 渠道</button>
-        <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-500 underline">退出</button>
+    <div class="flex items-center gap-2 flex-shrink-0 min-w-[260px]">
+      <input type="text" id="quickInput" placeholder="盲打：姓名 电话 定金 渠道" class="flex-1 px-4 py-2.5 rounded-xl border text-sm bg-white/80 outline-none">
+      <button onclick="handleQuickInput()" class="px-4 py-2.5 rounded-xl text-white font-bold" style="background:var(--green);">↵</button>
     </div>
+  </header>
 
-    <!-- 盲打录入框 -->
-    <div class="flex items-center gap-2 flex-shrink-0 min-w-[280px]">
-        <input type="text" id="quickInput" placeholder="盲打录入：姓名 电话 定金 渠道 → 回车"
-        class="flex-1 px-4 py-2.5 rounded-xl border text-sm font-medium outline-none transition-all duration-200
-        bg-white/80 backdrop-blur-sm focus:bg-white focus:border-green-400 focus:shadow-md focus:shadow-green-100"
-        style="border-color:var(--border); min-width:220px;"
-        autocomplete="off">
-        <button onclick="handleQuickInput()" class="px-4 py-2.5 rounded-xl text-white font-bold text-sm transition-all duration-200 hover:shadow-lg"
-        style="background:var(--green);">↵</button>
-    </div>
-</header>
-
-<!-- ==================== 主体三栏布局 ==================== -->
-<div class="flex flex-1 overflow-hidden" style="min-height:0;">
-
-    <!-- 左侧运力墙 15% -->
+  <!-- 主体三栏 -->
+  <div class="flex flex-1 overflow-hidden" style="min-height:0;">
     <aside class="staff-wall w-[15%] min-w-[160px] flex flex-col overflow-y-auto flex-shrink-0 p-3 gap-3" id="staffWall">
-        <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 text-center">💄 化妆师运力</div>
-        <div id="makeupStaffList" class="flex flex-col gap-2"></div>
-        <hr class="my-2 border-gray-200">
-        <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 text-center">📷 摄影师运力</div>
-        <div id="photoStaffList" class="flex flex-col gap-2"></div>
-        <div class="mt-auto pt-4 text-center">
-            <button onclick="addStaffPrompt('makeup')" class="text-xs text-gray-400 hover:text-gray-600 underline cursor-pointer">+ 添化妆师</button>
-            <button onclick="addStaffPrompt('photo')" class="text-xs text-gray-400 hover:text-gray-600 underline cursor-pointer ml-3">+ 添摄影师</button>
-        </div>
+      <div class="text-xs font-bold text-gray-500 uppercase text-center">💄 化妆师</div>
+      <div id="makeupStaffList" class="flex flex-col gap-2"></div>
+      <hr class="my-2 border-gray-200">
+      <div class="text-xs font-bold text-gray-500 uppercase text-center">📷 摄影师</div>
+      <div id="photoStaffList" class="flex flex-col gap-2"></div>
+      <div class="mt-auto pt-4 text-center space-x-3">
+        <button onclick="addStaff('makeup')" class="text-xs text-gray-400 hover:text-gray-600 underline">+ 添化妆师</button>
+        <button onclick="addStaff('photo')" class="text-xs text-gray-400 hover:text-gray-600 underline">+ 添摄影师</button>
+      </div>
     </aside>
+    <main class="flex-1 flex gap-3 p-3 overflow-hidden" id="trackContainer"></main>
+  </div>
 
-    <!-- 中部六轨矩阵 85% -->
-    <main class="flex-1 flex gap-3 p-3 overflow-hidden" style="min-width:0;" id="trackContainer">
-        <!-- 轨道由JS动态渲染 -->
-    </main>
-</div>
+  <!-- 弹窗容器 -->
+  <div id="settingsModal" class="modal-overlay hidden"></div>
+  <div id="channelModal" class="modal-overlay hidden"></div>
+  <div id="callPartTimerModal" class="modal-overlay hidden"></div>
+  <div id="depositModal" class="modal-overlay hidden"></div>
+  <div id="printArea" style="display:none;"></div>
 
-<!-- ==================== 渠道管理弹窗 ==================== -->
-<div id="channelModal" class="modal-overlay hidden" onclick="if(event.target===this)closeChannelManager()">
-    <div class="modal-box" style="max-width:750px;">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-bold">📋 渠道管理</h2>
-            <button onclick="closeChannelManager()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
-        </div>
-        <div class="flex flex-col md:flex-row gap-4">
-            <!-- 左栏：新增渠道 -->
-            <div class="w-full md:w-1/3 bg-gray-50 rounded-xl p-4">
-                <h3 class="font-semibold text-sm mb-3">➕ 新增渠道标签</h3>
-                <div class="flex gap-2">
-                    <input type="text" id="newChannelInput" placeholder="如：小红书、抖音…" class="flex-1 px-3 py-2 rounded-lg border text-sm">
-                    <button onclick="addNewChannel()" class="px-4 py-2 rounded-lg text-white font-bold text-sm" style="background:var(--green);">添加</button>
-                </div>
-                <p class="text-xs text-gray-400 mt-2">* 新渠道将在下次统计中生效</p>
-            </div>
-            <!-- 右栏：今日统计表格 -->
-            <div class="w-full md:w-2/3">
-                <h3 class="font-semibold text-sm mb-2">📊 今日渠道对账表</h3>
-                <div class="overflow-x-auto max-h-64 overflow-y-auto">
-                    <table class="w-full text-xs border-collapse">
-                        <thead class="bg-gray-100 sticky top-0">
-                            <tr>
-                                <th class="p-2 text-left">渠道</th>
-                                <th class="p-2 text-right">订单数</th>
-                                <th class="p-2 text-right">总金额</th>
-                            </tr>
-                        </thead>
-                        <tbody id="channelTableBody"></tbody>
-                        <tfoot id="channelTableFoot" class="font-bold border-t-2 border-gray-300"></tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="flex justify-end mt-4">
-            <button onclick="closeChannelManager()" class="px-4 py-2 rounded-lg text-white font-bold text-sm" style="background:var(--green);">关闭</button>
-        </div>
-    </div>
-</div>
-
-<!-- ==================== 呼叫兼职弹窗 ==================== -->
-<div id="callPartTimerModal" class="modal-overlay hidden">
-    <div class="modal-box">
-        <h2 class="text-lg font-bold mb-4">📣 一键呼叫外部兼职</h2>
-        <div class="space-y-3 text-sm">
-            <div>
-                <label class="font-semibold block mb-1">基础工费 (¥)</label>
-                <input type="number" id="basePay" value="200" class="w-full px-3 py-2 rounded-lg border">
-            </div>
-            <div>
-                <label class="font-semibold block mb-1">工种风格</label>
-                <select id="styleSelect" class="w-full px-3 py-2 rounded-lg border">
-                    <optgroup label="化妆造型">
-                        <option>傣族重工</option>
-                        <option>敦煌飞天</option>
-                        <option>苗族银饰</option>
-                        <option>大唐古风</option>
-                        <option>清宫旗头</option>
-                        <option>西域公主</option>
-                        <option>战国袍</option>
-                        <option>现代高奢</option>
-                    </optgroup>
-                    <optgroup label="摄影风格">
-                        <option>暮光夜景</option>
-                        <option>日系复古</option>
-                        <option>新中式国潮</option>
-                        <option>纪实情绪</option>
-                        <option>法式浪漫</option>
-                        <option>纪实旅拍</option>
-                        <option>高级大片</option>
-                    </optgroup>
-                </select>
-            </div>
-            <div class="flex items-center gap-3">
-                <label class="font-semibold">二消提成</label>
-                <input type="checkbox" id="commissionToggle" checked>
-                <span class="text-xs text-gray-500">启用</span>
-            </div>
-            <div>
-                <label class="font-semibold block mb-1">店员提成比例 (%)</label>
-                <input type="number" id="commissionPercent" value="20" class="w-full px-3 py-2 rounded-lg border">
-            </div>
-        </div>
-        <button onclick="confirmCall()" class="mt-4 w-full py-2 rounded-lg text-white font-bold text-sm" style="background:var(--copper);">确认发布</button>
-        <button onclick="document.getElementById('callPartTimerModal').classList.add('hidden')" class="mt-2 w-full py-2 rounded-lg border text-sm">取消</button>
-    </div>
-</div>
-
-<!-- ==================== 押金弹窗 ==================== -->
-<div id="depositModal" class="modal-overlay hidden" onclick="if(event.target===this)closeDepositModal()">
-    <div class="modal-box text-sm">
-        <h3 class="font-bold text-lg mb-3">⚠️ 服装外借 - 押金登记</h3>
-        <p class="mb-2 text-gray-600">客户离店需确认押金已收</p>
-        <label class="font-semibold block mb-1">押金金额 (¥)</label>
-        <input type="number" id="depositAmountInput" class="w-full px-3 py-2 rounded-lg border text-sm mb-3" placeholder="请输入押金金额" min="0">
-        <div class="flex gap-2 justify-end">
-            <button onclick="closeDepositModal()" class="btn-action px-4 py-2">取消</button>
-            <button onclick="confirmDeposit()" class="btn-action btn-copper px-4 py-2 font-bold">确认已收押金</button>
-        </div>
-    </div>
-</div>
-
-<!-- ==================== 打印区域（隐藏） ==================== -->
-<div id="printArea" style="display:none;"></div>
-
-<script>
-    (function() {
-        // ==================== IndexedDB 封装 ====================
-        const DB_NAME = 'TravelPhotoScheduler';
-        const DB_VERSION = 1;
-        let db = null;
-
-        function openDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                request.onupgradeneeded = (e) => {
-                    const database = e.target.result;
-                    if (!database.objectStoreNames.contains('orders')) {
-                        database.createObjectStore('orders', { keyPath: 'id' });
-                    }
-                    if (!database.objectStoreNames.contains('staff')) {
-                        database.createObjectStore('staff', { keyPath: 'id' });
-                    }
-                    if (!database.objectStoreNames.contains('settings')) {
-                        database.createObjectStore('settings', { keyPath: 'key' });
-                    }
-                };
-                request.onsuccess = (e) => {
-                    db = e.target.result;
-                    resolve(db);
-                };
-                request.onerror = (e) => reject(e.target.error);
-            });
-        }
-
-        function dbPut(storeName, data) {
-            return new Promise((resolve, reject) => {
-                if (!db) { reject('DB not ready'); return; }
-                const tx = db.transaction(storeName, 'readwrite');
-                const store = tx.objectStore(storeName);
-                store.put(data);
-                tx.oncomplete = () => resolve();
-                tx.onerror = (e) => reject(e.target.error);
-            });
-        }
-
-        function dbGetAll(storeName) {
-            return new Promise((resolve, reject) => {
-                if (!db) { reject('DB not ready'); return; }
-                const tx = db.transaction(storeName, 'readonly');
-                const store = tx.objectStore(storeName);
-                const request = store.getAll();
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = (e) => reject(e.target.error);
-            });
-        }
-
-        function dbDelete(storeName, id) {
-            return new Promise((resolve, reject) => {
-                if (!db) { reject('DB not ready'); return; }
-                const tx = db.transaction(storeName, 'readwrite');
-                const store = tx.objectStore(storeName);
-                store.delete(id);
-                tx.oncomplete = () => resolve();
-                tx.onerror = (e) => reject(e.target.error);
-            });
-        }
-
-        // ==================== 数据模型 ====================
-        const TRACKS = [
-            { id: 'track1', name: '预约到店', icon: '📋', key: 'appointment' },
-            { id: 'track2', name: '选衣确认', icon: '👗', key: 'cloth' },
-            { id: 'track3', name: '妆造中', icon: '💄', key: 'styling' },
-            { id: 'track4', name: '指派摄影', icon: '📷', key: 'shooting' },
-            { id: 'track5', name: '选片', icon: '🖼️', key: 'selection' },
-            { id: 'track6', name: '精修交付', icon: '✅', key: 'delivery' },
-        ];
-
-        // 全局状态
-        let allOrders = [];
-        let allStaff = [];
-        let appSettings = {
-            selectionMode: 'inStore',
-            priceStandard: 40,
-            pricePremium: 60,
-            priceCommercial: 100,
-        };
-        let todayFlowCounter = 0;
-        let draggingOrderId = null;
-        let hoveredTrackKey = null;
-        let pendingDepositOrderId = null;
-        let globalHighlightRole = null;
-
-        // ==================== 权限与登录 ====================
-        const PASSWORDS = { staff: 'staff888', boss: 'boss999' };
-        const ROLE_KEY = 'app_auth_role';
-        let currentRole = null;
-
-        function applyRolePermissions() {
-            const revenueEl = document.getElementById('todayRevenue');
-            const channelBtn = document.getElementById('channelBtn');
-            if (currentRole === 'staff') {
-                if (revenueEl) {
-                    revenueEl.textContent = '***';
-                    revenueEl.style.color = '#999';
-                }
-                if (channelBtn) {
-                    channelBtn.classList.add('pointer-events-none', 'opacity-50');
-                    channelBtn.title = '员工权限不足';
-                }
-            } else {
-                if (revenueEl) revenueEl.style.color = '';
-                if (channelBtn) {
-                    channelBtn.classList.remove('pointer-events-none', 'opacity-50');
-                    channelBtn.title = '渠道对账';
-                }
-                if (typeof updateRevenue === 'function') updateRevenue();
-            }
-        }
-
-        function handleLogin() {
-            const pwd = document.getElementById('passwordInput').value.trim();
-            const overlay = document.getElementById('authOverlay');
-            if (pwd === PASSWORDS.boss) {
-                sessionStorage.setItem(ROLE_KEY, 'boss');
-                currentRole = 'boss';
-                overlay.classList.add('hidden');
-                applyRolePermissions();
-                renderAll();
-            } else if (pwd === PASSWORDS.staff) {
-                sessionStorage.setItem(ROLE_KEY, 'staff');
-                currentRole = 'staff';
-                overlay.classList.add('hidden');
-                applyRolePermissions();
-                renderAll();
-            } else {
-                alert('密码错误');
-                document.getElementById('passwordInput').value = '';
-                document.getElementById('passwordInput').focus();
-            }
-        }
-
-        window.logout = function() {
-            if (confirm('确定退出登录？')) {
-                sessionStorage.removeItem(ROLE_KEY);
-                location.reload();
-            }
-        };
-
-        // 页面加载时检查登录状态
-        function checkAuthOnLoad() {
-            const savedRole = sessionStorage.getItem(ROLE_KEY);
-            if (savedRole === 'boss' || savedRole === 'staff') {
-                currentRole = savedRole;
-                document.getElementById('authOverlay').classList.add('hidden');
-                applyRolePermissions();
-            } else {
-                document.getElementById('authOverlay').classList.remove('hidden');
-            }
-        }
-
-        document.getElementById('loginBtn').addEventListener('click', handleLogin);
-        document.getElementById('passwordInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') handleLogin();
+  <script>
+    (() => {
+      // ==================== IndexedDB ====================
+      const DB_NAME = 'TravelPhotoScheduler';
+      let db;
+      function openDB() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(DB_NAME, 1);
+          req.onupgradeneeded = (e) => {
+            const d = e.target.result;
+            if (!d.objectStoreNames.contains('orders')) d.createObjectStore('orders', { keyPath: 'id' });
+            if (!d.objectStoreNames.contains('staff')) d.createObjectStore('staff', { keyPath: 'id' });
+            if (!d.objectStoreNames.contains('settings')) d.createObjectStore('settings', { keyPath: 'key' });
+          };
+          req.onsuccess = (e) => { db = e.target.result; resolve(db); };
+          req.onerror = (e) => reject(e.target.error);
         });
-
-        // ==================== 初始化默认数据 ====================
-        function getDefaultStaff() {
-            return [
-                { id: 'staff_m1', name: '化妆师·琳达', role: 'makeup', status: 'idle', currentLoad: 0 },
-                { id: 'staff_m2', name: '化妆师·小雅', role: 'makeup', status: 'idle', currentLoad: 0 },
-                { id: 'staff_m3', name: '化妆师·艾米', role: 'makeup', status: 'idle', currentLoad: 0 },
-                { id: 'staff_p1', name: '摄影师·阿杰', role: 'photo', status: 'idle', currentLoad: 0 },
-                { id: 'staff_p2', name: '摄影师·浩然', role: 'photo', status: 'idle', currentLoad: 0 },
-                { id: 'staff_p3', name: '摄影师·子轩', role: 'photo', status: 'idle', currentLoad: 0 },
-            ];
-        }
-
-        function getDefaultOrders() {
-            const today = new Date().toISOString().split('T')[0];
-            return [
-                {
-                    id: 'order_demo1',
-                    flowNumber: '#001',
-                    name: '张美琳',
-                    phone: '13800001111',
-                    deposit: 300,
-                    channel: '美团',
-                    type: 'comprehensive',
-                    currentTrack: 'track1',
-                    timestamp: Date.now() - 3600000,
-                    wechatAdded: false,
-                    makeupArtistId: null,
-                    photographerId: null,
-                    depositAmount: 0,
-                    rentalReturned: false,
-                    extraPhotos: 0,
-                    retouchLevel: 'standard',
-                    extraCost: 0,
-                    totalAmount: 300,
-                    date: today,
-                    rentalDepositPaid: false,
-                },
-                {
-                    id: 'order_demo2',
-                    flowNumber: '#002',
-                    name: '李思远',
-                    phone: '13900002222',
-                    deposit: 500,
-                    channel: '导游小陈',
-                    type: 'photo_only',
-                    currentTrack: 'track4',
-                    timestamp: Date.now() - 1800000,
-                    wechatAdded: true,
-                    makeupArtistId: null,
-                    photographerId: 'staff_p1',
-                    depositAmount: 0,
-                    rentalReturned: false,
-                    extraPhotos: 5,
-                    retouchLevel: 'premium',
-                    extraCost: 300,
-                    totalAmount: 800,
-                    date: today,
-                    rentalDepositPaid: false,
-                },
-                {
-                    id: 'order_demo3',
-                    flowNumber: '#003',
-                    name: '王语嫣',
-                    phone: '13700003333',
-                    deposit: 200,
-                    channel: '小红书',
-                    type: 'makeup_only',
-                    currentTrack: 'track3',
-                    timestamp: Date.now() - 900000,
-                    wechatAdded: false,
-                    makeupArtistId: 'staff_m1',
-                    photographerId: null,
-                    depositAmount: 0,
-                    rentalReturned: false,
-                    extraPhotos: 0,
-                    retouchLevel: 'standard',
-                    extraCost: 0,
-                    totalAmount: 200,
-                    date: today,
-                    rentalDepositPaid: false,
-                },
-            ];
-        }
-
-        // ==================== 数据加载与同步 ====================
-        async function loadAllData() {
-            try {
-                const orders = await dbGetAll('orders');
-                const staff = await dbGetAll('staff');
-                const settingsArr = await dbGetAll('settings');
-                if (orders.length === 0 && staff.length === 0) {
-                    const defStaff = getDefaultStaff();
-                    const defOrders = getDefaultOrders();
-                    for (const s of defStaff) await dbPut('staff', s);
-                    for (const o of defOrders) await dbPut('orders', o);
-                    allStaff = defStaff;
-                    allOrders = defOrders;
-                    todayFlowCounter = defOrders.length;
-                } else {
-                    allStaff = staff.length > 0 ? staff : getDefaultStaff();
-                    allOrders = orders;
-                    todayFlowCounter = orders.length;
-                }
-                if (settingsArr.length > 0) {
-                    const settingsMap = {};
-                    settingsArr.forEach(s => settingsMap[s.key] = s.value);
-                    appSettings.selectionMode = settingsMap['selectionMode'] || 'inStore';
-                    appSettings.priceStandard = parseFloat(settingsMap['priceStandard']) || 40;
-                    appSettings.pricePremium = parseFloat(settingsMap['pricePremium']) || 60;
-                    appSettings.priceCommercial = parseFloat(settingsMap['priceCommercial']) || 100;
-                }
-                if (allStaff.length === 0) allStaff = getDefaultStaff();
-                recalcStaffLoads();
-                renderAll();
-            } catch (err) {
-                console.error('数据加载失败，使用内存默认数据:', err);
-                allStaff = getDefaultStaff();
-                allOrders = getDefaultOrders();
-                todayFlowCounter = allOrders.length;
-                recalcStaffLoads();
-                renderAll();
-            }
-        }
-
-        async function saveOrder(order) {
-            await dbPut('orders', order);
-        }
-
-        async function saveStaff(s) {
-            await dbPut('staff', s);
-        }
-
-        // 保存设置（当从选片轨道头部控件更新时调用）
-        async function saveSettings() {
-            const settingsData = [
-                { key: 'selectionMode', value: appSettings.selectionMode },
-                { key: 'priceStandard', value: appSettings.priceStandard },
-                { key: 'pricePremium', value: appSettings.pricePremium },
-                { key: 'priceCommercial', value: appSettings.priceCommercial },
-            ];
-            for (const s of settingsData) await dbPut('settings', s);
-            // 重新计算所有订单的加选费用
-            allOrders.forEach(o => recalcExtraCost(o));
-            renderAll();
-        }
-
-        // ==================== 运力计算 ====================
-        function recalcStaffLoads() {
-            allStaff.forEach(s => { s.currentLoad = 0;
-                s.status = 'idle'; });
-            allOrders.forEach(order => {
-                if (order.currentTrack === 'track3' && order.makeupArtistId) {
-                    const staff = allStaff.find(s => s.id === order.makeupArtistId);
-                    if (staff) staff.currentLoad++;
-                }
-                if (order.currentTrack === 'track4' && order.photographerId) {
-                    const staff = allStaff.find(s => s.id === order.photographerId);
-                    if (staff) staff.currentLoad++;
-                }
-            });
-            allStaff.forEach(s => {
-                if (s.currentLoad === 0) s.status = 'idle';
-                else if (s.currentLoad === 1) s.status = 'busy';
-                else s.status = 'overload';
-            });
-        }
-
-        function getStaffStatusText(s) {
-            if (s.status === 'idle') return '🟢 空闲';
-            if (s.status === 'busy') return '🟡 忙碌';
-            return '🔴 超载';
-        }
-
-        // ==================== 渲染引擎 ====================
-        function renderAll() {
-            renderStaffWall();
-            renderTracks();
-            updateRevenue();
-            updateTrackBadges();
-        }
-
-        function renderStaffWall() {
-            const makeupList = document.getElementById('makeupStaffList');
-            const photoList = document.getElementById('photoStaffList');
-            const makeupStaff = allStaff.filter(s => s.role === 'makeup');
-            const photoStaff = allStaff.filter(s => s.role === 'photo');
-
-            function buildStaffHTML(staff) {
-                let extraClass = '';
-                if (globalHighlightRole === staff.role && staff.status === 'idle') {
-                    extraClass = 'idle-highlight';
-                }
-                if (staff.status === 'overload') {
-                    extraClass = 'overload-warn';
-                }
-                return `
-                    <div class="staff-card p-2 text-xs ${extraClass}" data-staff-id="${staff.id}" data-role="${staff.role}">
-                        <div class="flex justify-between items-center">
-                            <span class="font-semibold text-gray-800 truncate">${staff.name}</span>
-                            <button class="text-gray-400 hover:text-red-500 font-bold text-sm leading-none ml-1" onclick="event.stopPropagation(); removeStaff('${staff.id}')">✕</button>
-                        </div>
-                        <div class="flex items-center justify-between mt-1">
-                            <span class="text-gray-500">${getStaffStatusText(staff)}</span>
-                            <span class="font-bold text-gray-700">${staff.currentLoad}单</span>
-                        </div>
-                    </div>`;
-            }
-            makeupList.innerHTML = makeupStaff.map(buildStaffHTML).join('') ||
-                '<p class="text-xs text-gray-400 text-center">暂无化妆师</p>';
-            photoList.innerHTML = photoStaff.map(buildStaffHTML).join('') ||
-                '<p class="text-xs text-gray-400 text-center">暂无摄影师</p>';
-        }
-
-        function renderTracks() {
-            const container = document.getElementById('trackContainer');
-            let html = '';
-            TRACKS.forEach(track => {
-                const ordersInTrack = allOrders.filter(o => o.currentTrack === track.id);
-                let sortedOrders = [...ordersInTrack];
-                if (track.key === 'selection' && appSettings.selectionMode === 'inStore') {
-                    sortedOrders.sort((a, b) => a.timestamp - b.timestamp);
-                } else {
-                    sortedOrders.sort((a, b) => b.timestamp - a.timestamp);
-                }
-                const count = sortedOrders.length;
-
-                // 如果是选片轨道，头部需要额外集成设置面板
-                let extraHeaderContent = '';
-                if (track.key === 'selection') {
-                    extraHeaderContent = `
-                    <div class="mt-2 flex flex-wrap items-center justify-center gap-2 text-xs bg-gray-50 rounded-lg p-2 border border-gray-100">
-                        <select id="inlineSelectionMode" class="px-2 py-1 rounded border text-xs" onchange="updateSelectionMode(this.value)">
-                            <option value="inStore" ${appSettings.selectionMode === 'inStore' ? 'selected' : ''}>店内选片</option>
-                            <option value="remote" ${appSettings.selectionMode === 'remote' ? 'selected' : ''}>离店自选</option>
-                        </select>
-                        <div class="flex items-center gap-1">
-                            <label class="text-gray-500">标准</label>
-                            <input type="number" id="inlinePriceStandard" value="${appSettings.priceStandard}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updatePriceStandard(this.value)">
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <label class="text-gray-500">超精</label>
-                            <input type="number" id="inlinePricePremium" value="${appSettings.pricePremium}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updatePricePremium(this.value)">
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <label class="text-gray-500">商业</label>
-                            <input type="number" id="inlinePriceCommercial" value="${appSettings.priceCommercial}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updatePriceCommercial(this.value)">
-                        </div>
-                    </div>`;
-                }
-
-                html += `
-                <div class="track-column flex-1 min-w-[130px]"
-                data-track-id="${track.id}"
-                data-track-key="${track.key}"
-                ondragover="handleDragOver(event, '${track.id}', '${track.key}')"
-                ondragleave="handleDragLeave(event, '${track.id}')"
-                ondrop="handleDrop(event, '${track.id}', '${track.key}')"
-                id="track-col-${track.id}">
-                <div class="track-header">
-                    <span class="track-dot"></span>
-                    <span class="font-bold text-xs text-gray-700">${track.icon} ${track.name}</span>
-                    <span class="track-badge" id="badge-${track.id}">${count}</span>
-                    ${extraHeaderContent}
-                </div>
-                <div class="track-body" id="track-body-${track.id}">
-                    ${sortedOrders.map(o => buildOrderCardHTML(o, track)).join('')}
-                </div>
-            </div>`;
-            });
-            container.innerHTML = html;
-            document.querySelectorAll('.order-card').forEach(card => {
-                card.addEventListener('dragstart', handleDragStart);
-                card.addEventListener('dragend', handleDragEnd);
-            });
-            updateTrackDisabledStates();
-        }
-
-        // 设置面板的值更新函数（挂载到window）
-        window.updateSelectionMode = function(mode) {
-            appSettings.selectionMode = mode;
-            saveSettings();
-        };
-        window.updatePriceStandard = function(val) {
-            appSettings.priceStandard = parseFloat(val) || 40;
-            saveSettings();
-        };
-        window.updatePricePremium = function(val) {
-            appSettings.pricePremium = parseFloat(val) || 60;
-            saveSettings();
-        };
-        window.updatePriceCommercial = function(val) {
-            appSettings.priceCommercial = parseFloat(val) || 100;
-            saveSettings();
-        };
-
-        function buildOrderCardHTML(order, track) {
-            let typeTagHTML = '';
-            if (order.type === 'makeup_only') {
-                typeTagHTML = '<span class="type-tag makeup">💄 仅限妆造</span>';
-            } else if (order.type === 'rental') {
-                typeTagHTML = '<span class="type-tag rental">👗 服装外借</span>';
-            } else if (order.type === 'photo_only') {
-                typeTagHTML = '<span class="type-tag photo">📷 仅限拍摄</span>';
-            }
-
-            let wechatHTML = '';
-            if (track.key === 'selection' && appSettings.selectionMode === 'remote') {
-                if (order.wechatAdded) {
-                    wechatHTML = '<span class="text-green-500 text-xs font-bold cursor-pointer" title="已加微信">💚 已加微信</span>';
-                } else {
-                    wechatHTML = `<span class="text-gray-400 text-xs font-bold cursor-pointer line-through decoration-red-400" title="点击标记已加微信" onclick="event.stopPropagation();markWechatAdded('${order.id}')">🔘 未加微信</span>`;
-                }
-            }
-
-            let rentalBlockHTML = '';
-            if (order.type === 'rental' && track.key === 'selection') {
-                if (!order.rentalDepositPaid) {
-                    rentalBlockHTML = `
-                    <div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:8px;padding:6px 8px;margin-top:6px;font-size:10px;">
-                        ⚠️ <b>押金未登记</b>
-                        <button class="btn-action btn-copper text-xs px-2 py-1 ml-1" onclick="event.stopPropagation();openDepositModal('${order.id}')">登记押金</button>
-                    </div>`;
-                } else {
-                    rentalBlockHTML = `
-                    <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:6px 8px;margin-top:6px;font-size:10px;">
-                        ✅ 已收押金 ¥${order.depositAmount} | ${order.rentalReturned ? '✅ 已归还' : '👗 衣服未还'}
-                        ${!order.rentalReturned ? `<button class="btn-action btn-green text-xs px-2 py-1 ml-1" onclick="event.stopPropagation();markRentalReturned('${order.id}')">确认归还</button>` : ''}
-                    </div>`;
-                }
-            }
-
-            let priceCalcHTML = '';
-            if (track.key === 'selection' && appSettings.selectionMode === 'inStore') {
-                const levelLabels = { standard: '标准精修', premium: '超精修', commercial: '商业精修' };
-                priceCalcHTML = `
-                <div class="price-calc" onclick="event.stopPropagation();">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <select onchange="updateRetouchLevel('${order.id}', this.value)" class="text-xs">
-                            <option value="standard" ${order.retouchLevel==='standard'?'selected':''}>标准精修 ¥${appSettings.priceStandard}</option>
-                            <option value="premium" ${order.retouchLevel==='premium'?'selected':''}>超精修 ¥${appSettings.pricePremium}</option>
-                            <option value="commercial" ${order.retouchLevel==='commercial'?'selected':''}>商业精修 ¥${appSettings.priceCommercial}</option>
-                        </select>
-                        <span class="text-xs text-gray-500">加选:</span>
-                        <button class="qty-btn" onclick="changeExtraPhotos('${order.id}', -1)">−</button>
-                        <span class="qty-num">${order.extraPhotos}</span>
-                        <button class="qty-btn" onclick="changeExtraPhotos('${order.id}', 1)">+</button>
-                        <span class="font-bold text-xs ml-auto" style="color:var(--copper);">+¥${order.extraCost}</span>
-                    </div>
-                    <div class="text-xs text-gray-500 mt-1">超出张数 × 单价 = 加选费用</div>
-                </div>`;
-            }
-
-            let printBtnHTML = '';
-            if (track.key === 'selection' || track.key === 'delivery') {
-                printBtnHTML = `<button class="btn-action btn-print text-xs px-2 py-1 mt-1" onclick="event.stopPropagation();printOrder('${order.id}')">🖨️ 打印单据</button>`;
-            }
-
-            let skipBtnHTML = '';
-            if (order.type === 'makeup_only' && track.key === 'styling') {
-                skipBtnHTML = `<button class="btn-action btn-green text-xs px-2 py-1 mt-1" onclick="event.stopPropagation();skipToDelivery('${order.id}')">⏭️ 跳过拍摄 → 结算</button>`;
-            }
-
-            let overloadClass = '';
-            if (track.key === 'styling' && order.makeupArtistId) {
-                const s = allStaff.find(st => st.id === order.makeupArtistId);
-                if (s && s.currentLoad >= 2) overloadClass = 'overload-card';
-            }
-            if (track.key === 'shooting' && order.photographerId) {
-                const s = allStaff.find(st => st.id === order.photographerId);
-                if (s && s.currentLoad >= 2) overloadClass = 'overload-card';
-            }
-
-            return `
-            <div class="order-card ${overloadClass}"
-            draggable="true"
-            data-order-id="${order.id}"
-            id="card-${order.id}">
-            <span class="channel-tag">${order.channel || '散客'}</span>
-            ${typeTagHTML}
-            <div class="font-bold text-sm text-gray-900 mt-1">${order.flowNumber} ${order.name}</div>
-            <div class="text-xs text-gray-500">📱 ${order.phone || '无电话'} | 💰 定金¥${order.deposit || 0}</div>
-            ${wechatHTML}
-            ${rentalBlockHTML}
-            ${priceCalcHTML}
-            <div class="flex gap-1 flex-wrap mt-1">
-                ${skipBtnHTML}
-                ${printBtnHTML}
-            </div>
-            <div class="text-xs text-gray-400 mt-1">🕐 ${new Date(order.timestamp).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</div>
-        </div>`;
-    }
-
-    function updateTrackDisabledStates() {
-        TRACKS.forEach(track => {
-            const col = document.getElementById('track-col-' + track.id);
-            if (!col) return;
-            col.classList.remove('track-disabled');
+      }
+      function dbPut(store, data) {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(store, 'readwrite');
+          tx.objectStore(store).put(data);
+          tx.oncomplete = () => resolve();
+          tx.onerror = e => reject(e.target.error);
         });
-    }
-
-    function updateTrackBadges() {
-        TRACKS.forEach(track => {
-            const badge = document.getElementById('badge-' + track.id);
-            if (badge) {
-                const count = allOrders.filter(o => o.currentTrack === track.id).length;
-                badge.textContent = count;
-            }
+      }
+      function dbGetAll(store) {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(store, 'readonly');
+          const req = tx.objectStore(store).getAll();
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = e => reject(e.target.error);
         });
-    }
-
-    function updateRevenue() {
-        if (currentRole !== 'boss') return;
-        const today = new Date().toISOString().split('T')[0];
-        const todayOrders = allOrders.filter(o => o.date === today);
-        let total = 0;
-        todayOrders.forEach(o => {
-            total += (o.deposit || 0) + (o.extraCost || 0) + (o.depositAmount || 0);
+      }
+      function dbDelete(store, id) {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(store, 'readwrite');
+          tx.objectStore(store).delete(id);
+          tx.oncomplete = () => resolve();
+          tx.onerror = e => reject(e.target.error);
         });
-        document.getElementById('todayRevenue').textContent = '¥' + total.toLocaleString();
-    }
+      }
 
-    // ==================== 拖拽处理 ====================
-    function handleDragStart(e) {
-        const card = e.target.closest('.order-card');
-        if (!card) return;
-        draggingOrderId = card.dataset.orderId;
-        card.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', draggingOrderId);
-    }
-
-    function handleDragEnd(e) {
-        const card = e.target.closest('.order-card');
-        if (card) card.classList.remove('dragging');
-        draggingOrderId = null;
-        globalHighlightRole = null;
-        hoveredTrackKey = null;
-        document.querySelectorAll('.track-column').forEach(col => col.classList.remove('drag-over'));
-        renderStaffWall();
-    }
-
-    window.handleDragOver = function(e, trackId, trackKey) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        hoveredTrackKey = trackKey;
-        const col = document.getElementById('track-col-' + trackId);
-        if (col) col.classList.add('drag-over');
-
-        if (trackKey === 'styling') {
-            globalHighlightRole = 'makeup';
-        } else if (trackKey === 'shooting') {
-            globalHighlightRole = 'photo';
+      // ==================== 权限 ====================
+      const PASS = { staff: 'staff888', boss: 'boss999' };
+      let role = null;
+      function applyRole() {
+        if (role === 'staff') {
+          document.getElementById('todayRevenue').textContent = '***';
+          document.getElementById('channelBtn').classList.add('btn-disabled');
+          document.getElementById('channelBtn').onclick = () => alert('员工权限不足');
         } else {
-            globalHighlightRole = null;
+          document.getElementById('channelBtn').classList.remove('btn-disabled');
+          document.getElementById('channelBtn').onclick = openChannelManager;
         }
-        renderStaffWall();
+      }
+      document.getElementById('loginBtn').onclick = () => {
+        const pwd = document.getElementById('passwordInput').value;
+        if (pwd === PASS.boss) { role = 'boss'; sessionStorage.setItem('role','boss'); document.getElementById('authOverlay').classList.add('hidden'); applyRole(); refreshDashboard(); }
+        else if (pwd === PASS.staff) { role = 'staff'; sessionStorage.setItem('role','staff'); document.getElementById('authOverlay').classList.add('hidden'); applyRole(); refreshDashboard(); }
+        else alert('密码错误');
+      };
+      window.logout = () => { sessionStorage.removeItem('role'); location.reload(); };
 
-        if (draggingOrderId) {
-            const order = allOrders.find(o => o.id === draggingOrderId);
-            if (order) {
-                if (trackKey === 'styling' && order.type === 'photo_only') {
-                    e.dataTransfer.dropEffect = 'none';
-                    if (col) col.classList.add('track-disabled');
-                }
-                if (trackKey === 'shooting' && order.type === 'makeup_only') {
-                    e.dataTransfer.dropEffect = 'none';
-                    if (col) col.classList.add('track-disabled');
-                }
-            }
+      // ==================== 数据模型 ====================
+      const TRACKS = [
+        { id: 'track1', name: '预约到店', icon: '📋', key: 'appointment' },
+        { id: 'track2', name: '选衣确认', icon: '👗', key: 'cloth' },
+        { id: 'track3', name: '妆造中',   icon: '💄', key: 'styling' },
+        { id: 'track4', name: '指派摄影', icon: '📷', key: 'shooting' },
+        { id: 'track5', name: '选片',     icon: '🖼️', key: 'selection' },
+        { id: 'track6', name: '精修交付', icon: '✅', key: 'delivery' }
+      ];
+      let allOrders = [], allStaff = [], flowCounter = 0;
+      let settings = { selectionMode: 'inStore', priceStandard: 40, pricePremium: 60, priceCommercial: 100 };
+
+      function defStaff() {
+        return [
+          { id: 'staff_m1', name: '化妆师·琳达', role: 'makeup', status: 'idle', currentLoad: 0 },
+          { id: 'staff_m2', name: '化妆师·小雅', role: 'makeup', status: 'idle', currentLoad: 0 },
+          { id: 'staff_p1', name: '摄影师·阿杰', role: 'photo', status: 'idle', currentLoad: 0 },
+          { id: 'staff_p2', name: '摄影师·浩然', role: 'photo', status: 'idle', currentLoad: 0 }
+        ];
+      }
+      function defOrders() {
+        const t = new Date().toISOString().split('T')[0];
+        return [
+          { id: 'o1', flowNumber: '#001', name: '张美琳', phone: '13800001111', deposit: 300, channel: '美团', type: 'comprehensive', currentTrack: 'track1', timestamp: Date.now()-3600000, wechatAdded: false, makeupArtistId: null, photographerId: null, depositAmount: 0, rentalReturned: false, extraPhotos: 0, retouchLevel: 'standard', extraCost: 0, totalAmount: 300, date: t, rentalDepositPaid: false },
+          { id: 'o2', flowNumber: '#002', name: '李思远', phone: '13900002222', deposit: 500, channel: '导游小陈', type: 'photo_only', currentTrack: 'track4', timestamp: Date.now()-1800000, wechatAdded: true, makeupArtistId: null, photographerId: 'staff_p1', depositAmount: 0, rentalReturned: false, extraPhotos: 5, retouchLevel: 'premium', extraCost: 300, totalAmount: 800, date: t, rentalDepositPaid: false }
+        ];
+      }
+
+      // ==================== 核心数据加载 ====================
+      async function loadInitialData() {
+        const [orders, staff, sets] = await Promise.all([dbGetAll('orders'), dbGetAll('staff'), dbGetAll('settings')]);
+        if (!orders.length && !staff.length) {
+          allStaff = defStaff(); allOrders = defOrders();
+          for (const s of allStaff) await dbPut('staff', s);
+          for (const o of allOrders) await dbPut('orders', o);
+        } else {
+          allStaff = staff.length ? staff : defStaff();
+          allOrders = orders;
         }
-    };
+        if (sets.length) sets.forEach(s => { if (s.key) settings[s.key] = s.value; });
+        flowCounter = allOrders.length;
+        recalcStaff();
+      }
+      function recalcStaff() {
+        allStaff.forEach(s => { s.currentLoad = 0; s.status = 'idle'; });
+        allOrders.forEach(o => {
+          if (o.currentTrack === 'track3' && o.makeupArtistId) { const s = allStaff.find(x => x.id === o.makeupArtistId); if (s) s.currentLoad++; }
+          if (o.currentTrack === 'track4' && o.photographerId) { const s = allStaff.find(x => x.id === o.photographerId); if (s) s.currentLoad++; }
+        });
+        allStaff.forEach(s => {
+          if (s.currentLoad === 0) s.status = 'idle';
+          else if (s.currentLoad === 1) s.status = 'busy';
+          else s.status = 'overload';
+        });
+      }
 
-    window.handleDragLeave = function(e, trackId) {
-        const col = document.getElementById('track-col-' + trackId);
-        if (col) col.classList.remove('drag-over');
-        if (hoveredTrackKey === col?.dataset?.trackKey) {
-            hoveredTrackKey = null;
-            globalHighlightRole = null;
-            renderStaffWall();
-        }
-    };
-
-    window.handleDrop = async function(e, trackId, trackKey) {
-        e.preventDefault();
-        const col = document.getElementById('track-col-' + trackId);
-        if (col) col.classList.remove('drag-over');
-        globalHighlightRole = null;
-        hoveredTrackKey = null;
-
-        const orderId = e.dataTransfer.getData('text/plain') || draggingOrderId;
-        if (!orderId) { renderStaffWall(); return; }
-
-        const order = allOrders.find(o => o.id === orderId);
-        if (!order) { renderStaffWall(); return; }
-
-        if (trackKey === 'styling' && order.type === 'photo_only') {
-            alert('⚠️ 纯摄影模式订单无需妆造，请直接拖入「指派摄影」轨道');
-            renderStaffWall();
-            return;
-        }
-        if (trackKey === 'shooting' && order.type === 'makeup_only') {
-            alert('⚠️ 纯妆造模式订单无需拍摄，请使用「跳过拍摄」按钮直飞结算');
-            renderStaffWall();
-            return;
-        }
-        if (trackKey === 'selection' && order.type === 'rental' && !order.rentalDepositPaid) {
-            alert('⚠️ 服装外借订单在进入选片轨道前，必须登记押金！');
-            openDepositModal(order.id);
-        }
-
-        const oldTrack = order.currentTrack;
-        order.currentTrack = trackId;
-        order.timestamp = Date.now();
-
-        if (trackKey === 'styling' && !order.makeupArtistId && order.type !== 'photo_only') {
-            const idleStaff = allStaff.find(s => s.role === 'makeup' && s.status === 'idle');
-            if (idleStaff) {
-                order.makeupArtistId = idleStaff.id;
-            } else {
-                const makeupStaff = allStaff.filter(s => s.role === 'makeup');
-                if (makeupStaff.length > 0) {
-                    const leastLoaded = makeupStaff.reduce((a, b) => a.currentLoad <= b.currentLoad ? a : b);
-                    order.makeupArtistId = leastLoaded.id;
-                }
-            }
-        }
-        if (trackKey === 'shooting' && !order.photographerId && order.type !== 'makeup_only') {
-            const idleStaff = allStaff.find(s => s.role === 'photo' && s.status === 'idle');
-            if (idleStaff) {
-                order.photographerId = idleStaff.id;
-            } else {
-                const photoStaff = allStaff.filter(s => s.role === 'photo');
-                if (photoStaff.length > 0) {
-                    const leastLoaded = photoStaff.reduce((a, b) => a.currentLoad <= b.currentLoad ? a : b);
-                    order.photographerId = leastLoaded.id;
-                }
-            }
-        }
-        if (oldTrack === 'track3' && trackId !== 'track3') {
-            order.makeupArtistId = null;
-        }
-        if (oldTrack === 'track4' && trackId !== 'track4') {
-            order.photographerId = null;
-        }
-
-        await saveOrder(order);
-        recalcStaffLoads();
-        renderAll();
-
-        setTimeout(() => {
-            const cardEl = document.getElementById('card-' + order.id);
-            if (cardEl) {
-                cardEl.classList.add('drop-bounce');
-                setTimeout(() => cardEl.classList.remove('drop-bounce'), 500);
-            }
-            const trackBody = document.getElementById('track-body-' + trackId);
-            if (trackBody && cardEl) {
-                cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }, 80);
-
-        if (trackKey === 'styling' && order.makeupArtistId) {
-            const s = allStaff.find(st => st.id === order.makeupArtistId);
-            if (s && s.currentLoad >= 2) {
-                setTimeout(() => alert(`⚠️ 运力超载预警！\n${s.name} 当前背负 ${s.currentLoad} 单，请关注！`), 300);
-            }
-        }
-        if (trackKey === 'shooting' && order.photographerId) {
-            const s = allStaff.find(st => st.id === order.photographerId);
-            if (s && s.currentLoad >= 2) {
-                setTimeout(() => alert(`⚠️ 运力超载预警！\n${s.name} 当前背负 ${s.currentLoad} 单，请关注！`), 300);
-            }
-        }
-    };
-
-    // ==================== 智能输入解析（修复渠道识别） ====================
-    window.handleQuickInput = function() {
-        const input = document.getElementById('quickInput');
-        const raw = input.value.trim();
-        if (!raw) return;
-        const result = parseInput(raw);
-        createNewOrder(result);
-        input.value = '';
-        input.focus();
-    };
-
-    function parseInput(raw) {
-        // 按空格分割为词元
-        const tokens = raw.split(/\s+/).filter(Boolean);
-        if (tokens.length === 0) {
-            return { name: '匿名散客', phone: '', deposit: 0, channel: '散客' };
-        }
+      // ==================== 万能智能解析器（条件降级拆分） ====================
+      function parseInput(raw) {
+        const tokens = raw.trim().split(/[\s,，\t]+/).filter(Boolean);
+        if (tokens.length === 0) return { name: '匿名散客', phone: '', deposit: 0, channel: '散客' };
 
         // 最后一个词作为渠道
-        const channel = tokens.pop();
+        let channel = tokens[tokens.length - 1];
+        const remainingTokens = tokens.slice(0, -1);
 
-        // 剩余部分中提取电话和定金
+        // 如果最后一个词是纯数字（可能是电话号码或定金），则说明用户可能没有输入渠道，回退处理
+        if (/^\d+$/.test(channel)) {
+          // 可能是电话号码或定金，重新判断
+          if (channel.length === 11 && channel.startsWith('1')) {
+            // 最后一个词是电话号码，则没有渠道词
+            channel = '散客';
+            remainingTokens.push(channel); // 把电话号码放回剩余词元
+          } else {
+            // 是纯数字但不像电话，可能是定金，但也可能用户忘了渠道，保底为散客
+            channel = '散客';
+            remainingTokens.push(channel);
+          }
+        }
+
+        // 从剩余词元中提取电话和定金
         let phone = '';
         let deposit = 0;
-        const remainingTokens = [];
+        const nameTokens = [];
 
-        for (const token of tokens) {
-            if (!phone && /^1[3-9]\d{9}$/.test(token)) {
-                phone = token;
-            } else if (deposit === 0 && /^\d{1,6}$/.test(token) && parseInt(token) > 0) {
-                deposit = parseInt(token);
-            } else {
-                remainingTokens.push(token);
-            }
+        for (const token of remainingTokens) {
+          if (!phone && /^1[3-9]\d{9}$/.test(token)) {
+            phone = token;
+          } else if (deposit === 0 && /^\d{1,6}$/.test(token) && parseInt(token) > 0) {
+            deposit = parseInt(token);
+          } else {
+            nameTokens.push(token);
+          }
         }
 
-        // 剩余部分拼接为姓名
-        let name = remainingTokens.join('') || '匿名散客';
-        if (name.length > 10) name = name.substring(0, 10); // 防止过长
+        let name = nameTokens.join('') || '匿名散客';
+        if (name.length > 10) name = name.substring(0, 10);
 
         return { name, phone, deposit, channel };
-    }
+      }
 
-    async function createNewOrder(parsed) {
-        todayFlowCounter++;
+      // ==================== 全局刷新函数（数据流闭环核心） ====================
+      async function refreshDashboard() {
+        const orders = await dbGetAll('orders');
+        const staff = await dbGetAll('staff');
+        allOrders = orders;
+        allStaff = staff.length ? staff : defStaff();
+        recalcStaff();
+        renderAll();
+      }
+
+      function renderAll() {
+        renderStaffWall();
+        renderTracks();
+        if (role === 'boss') updateRevenue();
+        updateTrackBadges();
+      }
+
+      function renderStaffWall() {
+        const mList = document.getElementById('makeupStaffList');
+        const pList = document.getElementById('photoStaffList');
+        const card = (s) => {
+          const statusText = s.status === 'idle' ? '🟢空闲' : (s.status === 'busy' ? '🟡忙碌' : '🔴超载');
+          const warnClass = s.status === 'overload' ? 'overload-warn' : '';
+          return `<div class="staff-card p-2 text-xs ${warnClass}">
+            <div class="flex justify-between"><span class="font-semibold truncate">${s.name}</span><button class="text-gray-400 hover:text-red-500 font-bold" onclick="removeStaff('${s.id}')">✕</button></div>
+            <div class="flex justify-between mt-1"><span>${statusText}</span><span class="font-bold">${s.currentLoad}单</span></div>
+          </div>`;
+        };
+        mList.innerHTML = allStaff.filter(s => s.role === 'makeup').map(card).join('') || '<p class="text-xs text-gray-400 text-center">暂无</p>';
+        pList.innerHTML = allStaff.filter(s => s.role === 'photo').map(card).join('') || '<p class="text-xs text-gray-400 text-center">暂无</p>';
+      }
+
+      function renderTracks() {
+        const container = document.getElementById('trackContainer');
+        let html = '';
+        TRACKS.forEach(track => {
+          const orders = allOrders.filter(o => o.currentTrack === track.id);
+          let sorted = [...orders];
+          if (track.key === 'selection' && settings.selectionMode === 'inStore') {
+            sorted.sort((a, b) => a.timestamp - b.timestamp);
+          } else {
+            sorted.sort((a, b) => b.timestamp - a.timestamp);
+          }
+          let extraHeader = '';
+          if (track.key === 'selection') {
+            extraHeader = `
+            <div class="mt-2 flex flex-wrap items-center justify-center gap-2 text-xs bg-gray-50 rounded-lg p-2 border">
+              <select id="inlineSelectionMode" class="px-2 py-1 border rounded text-xs" onchange="updateSetting('selectionMode', this.value)">
+                <option value="inStore" ${settings.selectionMode === 'inStore' ? 'selected' : ''}>店内选片</option>
+                <option value="remote" ${settings.selectionMode === 'remote' ? 'selected' : ''}>离店自选</option>
+              </select>
+              <input type="number" value="${settings.priceStandard}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updateSetting('priceStandard', this.value)" placeholder="标准">
+              <input type="number" value="${settings.pricePremium}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updateSetting('pricePremium', this.value)" placeholder="超精">
+              <input type="number" value="${settings.priceCommercial}" class="w-14 px-1 py-0.5 border rounded text-xs" onchange="updateSetting('priceCommercial', this.value)" placeholder="商业">
+            </div>`;
+          }
+          html += `
+          <div class="track-column flex-1 min-w-[130px]" data-track-id="${track.id}" data-track-key="${track.key}"
+               ondragover="handleDragOver(event,'${track.id}','${track.key}')" ondragleave="handleDragLeave(event,'${track.id}')" ondrop="handleDrop(event,'${track.id}','${track.key}')">
+            <div class="track-header">
+              <span class="track-dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--green);margin-right:6px;"></span>
+              <span class="font-bold text-xs">${track.icon} ${track.name}</span>
+              <span class="track-badge" id="badge-${track.id}">${sorted.length}</span>
+              ${extraHeader}
+            </div>
+            <div class="track-body">${sorted.map(o => buildCard(o, track)).join('')}</div>
+          </div>`;
+        });
+        container.innerHTML = html;
+        document.querySelectorAll('.order-card').forEach(c => {
+          c.addEventListener('dragstart', e => { draggingId = e.target.closest('.order-card')?.dataset.orderId; e.target.classList.add('dragging'); });
+          c.addEventListener('dragend', e => { e.target.classList.remove('dragging'); draggingId = null; });
+        });
+      }
+
+      let draggingId = null;
+      function buildCard(o, track) {
+        let typeTag = '';
+        if (o.type === 'makeup_only') typeTag = '<span class="type-tag makeup" style="background:#fff3e0;color:#e65100;padding:2px 7px;border-radius:6px;font-size:10px;">💄仅限妆造</span>';
+        else if (o.type === 'rental') typeTag = '<span class="type-tag rental" style="background:#e3f2fd;color:#0d47a1;padding:2px 7px;border-radius:6px;font-size:10px;">👗服装外借</span>';
+        else if (o.type === 'photo_only') typeTag = '<span class="type-tag photo" style="background:#e8f5e9;color:#1b5e20;padding:2px 7px;border-radius:6px;font-size:10px;">📷仅限拍摄</span>';
+
+        let wechat = '';
+        if (track.key === 'selection' && settings.selectionMode === 'remote') {
+          wechat = o.wechatAdded ? '<span class="text-green-500 text-xs">💚已加微信</span>' : `<span class="text-gray-400 text-xs cursor-pointer line-through decoration-red-400" onclick="event.stopPropagation();markWechat('${o.id}')">🔘未加微信</span>`;
+        }
+        let rental = '';
+        if (o.type === 'rental' && track.key === 'selection') {
+          if (!o.rentalDepositPaid) rental = `<div class="bg-orange-50 border border-orange-200 rounded p-2 mt-2 text-xs">⚠️押金未登记 <button class="btn-action btn-copper ml-1" onclick="event.stopPropagation();openDeposit('${o.id}')">登记</button></div>`;
+          else rental = `<div class="bg-green-50 border border-green-200 rounded p-2 mt-2 text-xs">✅已收押金¥${o.depositAmount} ${o.rentalReturned?'已归还':'👗未还'} ${!o.rentalReturned?`<button class="btn-action btn-green ml-1" onclick="event.stopPropagation();returnRental('${o.id}')">确认归还</button>`:''}</div>`;
+        }
+        let price = '';
+        if (track.key === 'selection' && settings.selectionMode === 'inStore') {
+          price = `<div class="price-calc" onclick="event.stopPropagation()">
+            <select onchange="setRetouch('${o.id}',this.value)" class="text-xs">
+              <option value="standard" ${o.retouchLevel==='standard'?'selected':''}>标准 ¥${settings.priceStandard}</option>
+              <option value="premium" ${o.retouchLevel==='premium'?'selected':''}>超精 ¥${settings.pricePremium}</option>
+              <option value="commercial" ${o.retouchLevel==='commercial'?'selected':''}>商业 ¥${settings.priceCommercial}</option>
+            </select>
+            <button class="qty-btn" onclick="changeExtra('${o.id}',-1)">−</button><span class="qty-num">${o.extraPhotos}</span><button class="qty-btn" onclick="changeExtra('${o.id}',1)">+</button>
+            <span class="font-bold text-xs ml-auto" style="color:var(--copper);">+¥${o.extraCost}</span>
+          </div>`;
+        }
+        let printBtn = (track.key==='selection'||track.key==='delivery') ? `<button class="btn-action btn-print mt-1" onclick="event.stopPropagation();printOrder('${o.id}')">🖨️打印</button>` : '';
+        let skipBtn = (o.type==='makeup_only' && track.key==='styling') ? `<button class="btn-action btn-green mt-1" onclick="event.stopPropagation();skipToDelivery('${o.id}')">⏭️跳过拍摄</button>` : '';
+        return `<div class="order-card" draggable="true" data-order-id="${o.id}">
+          <span class="channel-tag" style="background:linear-gradient(135deg,#ede9fe,#f3e8ff);color:#7c3aed;padding:3px 8px;border-radius:999px;font-size:10px;">${o.channel||'散客'}</span> ${typeTag}
+          <div class="font-bold text-sm mt-1">${o.flowNumber} ${o.name}</div>
+          <div class="text-xs text-gray-500">📱${o.phone||'无'} | 💰定金¥${o.deposit||0}</div>
+          ${wechat} ${rental} ${price}
+          <div class="flex gap-1 flex-wrap mt-1">${skipBtn}${printBtn}</div>
+        </div>`;
+      }
+      function updateTrackBadges() {
+        TRACKS.forEach(t => {
+          const badge = document.getElementById('badge-'+t.id);
+          if (badge) badge.textContent = allOrders.filter(o => o.currentTrack === t.id).length;
+        });
+      }
+      function updateRevenue() {
+        if (role !== 'boss') return;
         const today = new Date().toISOString().split('T')[0];
-        const flowNum = '#' + String(todayFlowCounter).padStart(3, '0');
+        const total = allOrders.filter(o => o.date === today).reduce((s,o) => s + (o.deposit||0) + (o.extraCost||0) + (o.depositAmount||0), 0);
+        document.getElementById('todayRevenue').textContent = '¥' + total.toLocaleString();
+      }
+
+      // ==================== 录入闭环 ====================
+      window.handleQuickInput = async () => {
+        const raw = document.getElementById('quickInput').value.trim();
+        if (!raw) return;
+        const { name, phone, deposit, channel } = parseInput(raw);
+        flowCounter++;
+        const today = new Date().toISOString().split('T')[0];
         const newOrder = {
-            id: 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-            flowNumber: flowNum,
-            name: parsed.name,
-            phone: parsed.phone,
-            deposit: parsed.deposit,
-            channel: parsed.channel,
-            type: 'comprehensive',
-            currentTrack: 'track1',
-            timestamp: Date.now(),
-            wechatAdded: false,
-            makeupArtistId: null,
-            photographerId: null,
-            depositAmount: 0,
-            rentalReturned: false,
-            extraPhotos: 0,
-            retouchLevel: 'standard',
-            extraCost: 0,
-            totalAmount: parsed.deposit,
-            date: today,
-            rentalDepositPaid: false,
+          id: 'order_' + Date.now(),
+          flowNumber: '#' + String(flowCounter).padStart(3, '0'),
+          name, phone, deposit, channel,
+          type: 'comprehensive',
+          currentTrack: 'track1',
+          timestamp: Date.now(),
+          wechatAdded: false,
+          makeupArtistId: null,
+          photographerId: null,
+          depositAmount: 0,
+          rentalReturned: false,
+          extraPhotos: 0,
+          retouchLevel: 'standard',
+          extraCost: 0,
+          totalAmount: deposit,
+          date: today,
+          rentalDepositPaid: false
         };
-        allOrders.push(newOrder);
-        await saveOrder(newOrder);
-        recalcStaffLoads();
-        renderAll();
+        await dbPut('orders', newOrder);
+        document.getElementById('quickInput').value = '';
+        await refreshDashboard();
         setTimeout(() => {
-            const cardEl = document.getElementById('card-' + newOrder.id);
-            if (cardEl) {
-                cardEl.classList.add('drop-bounce');
-                setTimeout(() => cardEl.classList.remove('drop-bounce'), 500);
-                const trackBody = document.getElementById('track-body-track1');
-                if (trackBody) cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+          const card = document.getElementById('card-' + newOrder.id);
+          if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
-    }
+      };
 
-    // ==================== 业务操作 ====================
-    window.skipToDelivery = async function(orderId) {
-        const order = allOrders.find(o => o.id === orderId);
-        if (!order) return;
-        if (order.type !== 'makeup_only') {
-            alert('仅纯妆造模式可跳过拍摄');
-            return;
-        }
-        order.currentTrack = 'track6';
-        order.timestamp = Date.now();
-        order.makeupArtistId = null;
-        await saveOrder(order);
-        recalcStaffLoads();
-        renderAll();
-    };
+      // ==================== 设置联动 ====================
+      window.updateSetting = async (key, value) => {
+        if (key === 'selectionMode') settings.selectionMode = value;
+        else settings[key] = parseFloat(value) || 0;
+        const data = Object.entries(settings).map(([k, v]) => ({ key: k, value: v }));
+        for (const d of data) await dbPut('settings', d);
+        allOrders.forEach(o => {
+          const map = { standard: settings.priceStandard, premium: settings.pricePremium, commercial: settings.priceCommercial };
+          o.extraCost = (o.extraPhotos || 0) * (map[o.retouchLevel] || settings.priceStandard);
+          o.totalAmount = (o.deposit || 0) + (o.extraCost || 0) + (o.depositAmount || 0);
+        });
+        await refreshDashboard();
+      };
 
-    window.markWechatAdded = async function(orderId) {
-        const order = allOrders.find(o => o.id === orderId);
-        if (!order) return;
-        order.wechatAdded = true;
-        await saveOrder(order);
-        renderAll();
-    };
-
-    window.openDepositModal = function(orderId) {
-        pendingDepositOrderId = orderId;
-        document.getElementById('depositAmountInput').value = '';
+      // ==================== 业务操作 ====================
+      window.markWechat = async (id) => { const o = allOrders.find(x => x.id === id); if (o) { o.wechatAdded = true; await dbPut('orders', o); refreshDashboard(); } };
+      window.openDeposit = (id) => {
+        document.getElementById('depositModal').innerHTML = `
+        <div class="modal-box text-sm" onclick="event.stopPropagation()">
+          <h3 class="font-bold text-lg mb-3">⚠️ 押金登记</h3>
+          <input type="hidden" id="depId" value="${id}">
+          <label class="block mb-1">金额</label><input type="number" id="depAmt" class="w-full px-3 py-2 border rounded-lg mb-3">
+          <div class="flex gap-2 justify-end"><button onclick="document.getElementById('depositModal').classList.add('hidden')" class="btn-action">取消</button><button onclick="confirmDeposit()" class="btn-action btn-copper font-bold">确认</button></div>
+        </div>`;
         document.getElementById('depositModal').classList.remove('hidden');
-    };
-
-    window.closeDepositModal = function() {
-        pendingDepositOrderId = null;
+      };
+      window.confirmDeposit = async () => {
+        const id = document.getElementById('depId').value;
+        const amt = parseFloat(document.getElementById('depAmt').value) || 0;
+        const o = allOrders.find(x => x.id === id);
+        if (o) { o.rentalDepositPaid = true; o.depositAmount = amt; o.totalAmount += amt; await dbPut('orders', o); }
         document.getElementById('depositModal').classList.add('hidden');
-    };
+        refreshDashboard();
+      };
+      window.returnRental = async (id) => { const o = allOrders.find(x => x.id === id); if (o) { o.rentalReturned = true; await dbPut('orders', o); refreshDashboard(); } };
+      window.setRetouch = async (id, level) => { const o = allOrders.find(x => x.id === id); if (o) { o.retouchLevel = level; updateSetting('priceStandard', settings.priceStandard); } };
+      window.changeExtra = async (id, delta) => { const o = allOrders.find(x => x.id === id); if (o) { o.extraPhotos = Math.max(0, (o.extraPhotos||0) + delta); updateSetting('priceStandard', settings.priceStandard); } };
+      window.skipToDelivery = async (id) => { const o = allOrders.find(x => x.id === id); if (o && o.type === 'makeup_only') { o.currentTrack = 'track6'; o.timestamp = Date.now(); o.makeupArtistId = null; await dbPut('orders', o); refreshDashboard(); } };
 
-    window.confirmDeposit = async function() {
-        if (!pendingDepositOrderId) return;
-        const amount = parseInt(document.getElementById('depositAmountInput').value) || 0;
-        const order = allOrders.find(o => o.id === pendingDepositOrderId);
-        if (order) {
-            order.rentalDepositPaid = true;
-            order.depositAmount = amount;
-            order.totalAmount += amount;
-            await saveOrder(order);
-        }
-        closeDepositModal();
-        recalcStaffLoads();
-        renderAll();
-    };
+      // ==================== 运力增删 ====================
+      window.addStaff = async (r) => {
+        const name = prompt('姓名：');
+        if (!name) return;
+        const s = { id: 'staff_'+Date.now(), name, role: r, status: 'idle', currentLoad: 0 };
+        await dbPut('staff', s);
+        refreshDashboard();
+      };
+      window.removeStaff = async (id) => {
+        const s = allStaff.find(x => x.id === id);
+        if (!s) return;
+        if (s.currentLoad > 0) return alert('正在服务中，无法删除');
+        if (confirm(`移除 ${s.name}？`)) { await dbDelete('staff', id); refreshDashboard(); }
+      };
 
-    window.markRentalReturned = async function(orderId) {
-        const order = allOrders.find(o => o.id === orderId);
-        if (!order) return;
-        order.rentalReturned = true;
-        await saveOrder(order);
-        renderAll();
-    };
+      // ==================== 拖拽 ====================
+      window.handleDragOver = (e, trackId, key) => { e.preventDefault(); const col = document.getElementById('track-col-'+trackId); if (col) col.classList.add('drag-over'); };
+      window.handleDragLeave = (e, trackId) => { document.getElementById('track-col-'+trackId)?.classList.remove('drag-over'); };
+      window.handleDrop = async (e, trackId, key) => {
+        e.preventDefault();
+        document.getElementById('track-col-'+trackId)?.classList.remove('drag-over');
+        const id = draggingId || e.dataTransfer.getData('text/plain');
+        const o = allOrders.find(x => x.id === id);
+        if (!o) return;
+        if (key === 'styling' && o.type === 'photo_only') return alert('纯摄影无需妆造');
+        if (key === 'shooting' && o.type === 'makeup_only') return alert('纯妆造无需拍摄');
+        if (key === 'selection' && o.type === 'rental' && !o.rentalDepositPaid) { alert('请先登记押金'); return openDeposit(o.id); }
+        o.currentTrack = trackId;
+        o.timestamp = Date.now();
+        if (key === 'styling' && !o.makeupArtistId && o.type !== 'photo_only') { const idle = allStaff.find(s => s.role==='makeup' && s.status==='idle'); o.makeupArtistId = idle?.id || null; }
+        if (key === 'shooting' && !o.photographerId && o.type !== 'makeup_only') { const idle = allStaff.find(s => s.role==='photo' && s.status==='idle'); o.photographerId = idle?.id || null; }
+        if (o.currentTrack !== 'track3') o.makeupArtistId = null;
+        if (o.currentTrack !== 'track4') o.photographerId = null;
+        await dbPut('orders', o);
+        refreshDashboard();
+      };
 
-    window.updateRetouchLevel = async function(orderId, level) {
-        const order = allOrders.find(o => o.id === orderId);
-        if (!order) return;
-        order.retouchLevel = level;
-        recalcExtraCost(order);
-        await saveOrder(order);
-        renderAll();
-    };
-
-    window.changeExtraPhotos = async function(orderId, delta) {
-        const order = allOrders.find(o => o.id === orderId);
-        if (!order) return;
-        order.extraPhotos = Math.max(0, (order.extraPhotos || 0) + delta);
-        recalcExtraCost(order);
-        await saveOrder(order);
-        renderAll();
-    };
-
-    function recalcExtraCost(order) {
-        const priceMap = {
-            standard: appSettings.priceStandard,
-            premium: appSettings.pricePremium,
-            commercial: appSettings.priceCommercial,
-        };
-        const unitPrice = priceMap[order.retouchLevel] || appSettings.priceStandard;
-        order.extraCost = order.extraPhotos * unitPrice;
-        order.totalAmount = (order.deposit || 0) + order.extraCost + (order.depositAmount || 0);
-    }
-
-    // ==================== 运力增删 ====================
-    window.addStaffPrompt = async function(role) {
-        const name = prompt(`请输入新${role === 'makeup' ? '化妆师' : '摄影师'}姓名：`);
-        if (!name || !name.trim()) return;
-        const newStaff = {
-            id: 'staff_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-            name: name.trim(),
-            role: role,
-            status: 'idle',
-            currentLoad: 0,
-        };
-        allStaff.push(newStaff);
-        await saveStaff(newStaff);
-        recalcStaffLoads();
-        renderAll();
-    };
-
-    window.removeStaff = async function(id) {
-        const staff = allStaff.find(s => s.id === id);
-        if (!staff) return;
-        if (staff.currentLoad > 0) {
-            alert('该人员正在服务中，无法删除');
-            return;
-        }
-        if (confirm(`确定让 ${staff.name} 下班并移除？`)) {
-            allStaff = allStaff.filter(s => s.id !== id);
-            await dbDelete('staff', id);
-            recalcStaffLoads();
-            renderAll();
-        }
-    };
-
-    // ==================== 渠道弹窗 ====================
-    window.openChannelManager = function() {
+      // ==================== 弹窗 ====================
+      window.openChannelManager = () => {
         const today = new Date().toISOString().split('T')[0];
         const orders = allOrders.filter(o => o.date === today);
         const stats = {};
-        orders.forEach(o => {
-            const ch = o.channel || '散客';
-            if (!stats[ch]) stats[ch] = { count: 0, total: 0 };
-            stats[ch].count++;
-            stats[ch].total += (o.deposit || 0) + (o.extraCost || 0) + (o.depositAmount || 0);
-        });
-        const tbody = document.getElementById('channelTableBody');
-        const tfoot = document.getElementById('channelTableFoot');
-        let bodyHTML = '';
-        let totalCount = 0;
-        let totalAmount = 0;
-        Object.entries(stats).forEach(([ch, data]) => {
-            totalCount += data.count;
-            totalAmount += data.total;
-            bodyHTML += `
-                <tr class="border-b border-gray-100">
-                    <td class="p-2">${ch}</td>
-                    <td class="p-2 text-right">${data.count} 单</td>
-                    <td class="p-2 text-right">¥${data.total.toLocaleString()}</td>
-                </tr>`;
-        });
-        if (!bodyHTML) {
-            bodyHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-400">今日暂无订单</td></tr>';
-        }
-        tbody.innerHTML = bodyHTML;
-        tfoot.innerHTML = `
-            <tr>
-                <td class="p-2">📌 渠道对账结算</td>
-                <td class="p-2 text-right">合计 ${totalCount} 单</td>
-                <td class="p-2 text-right">¥${totalAmount.toLocaleString()}</td>
-            </tr>`;
-        document.getElementById('newChannelInput').value = '';
+        orders.forEach(o => { const ch = o.channel || '散客'; if (!stats[ch]) stats[ch] = { count: 0, total: 0 }; stats[ch].count++; stats[ch].total += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0); });
+        let rows = '', totalC = 0, totalA = 0;
+        for (const [ch, d] of Object.entries(stats)) { totalC += d.count; totalA += d.total; rows += `<tr class="border-b"><td class="p-2">${ch}</td><td class="p-2 text-right">${d.count}单</td><td class="p-2 text-right">¥${d.total.toLocaleString()}</td></tr>`; }
+        document.getElementById('channelModal').innerHTML = `
+        <div class="modal-box" style="max-width:700px;"><div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold">📋 渠道对账</h2><button onclick="document.getElementById('channelModal').classList.add('hidden')" class="text-gray-400 text-2xl">&times;</button></div>
+        <div class="overflow-auto max-h-96"><table class="w-full text-xs"><thead><tr class="bg-gray-100"><th class="p-2 text-left">渠道</th><th class="p-2 text-right">订单数</th><th class="p-2 text-right">总金额</th></tr></thead><tbody>${rows||'<tr><td colspan="3" class="p-4 text-center text-gray-400">暂无数据</td></tr>'}</tbody><tfoot class="font-bold border-t-2"><tr><td class="p-2">📌合计</td><td class="p-2 text-right">${totalC}单</td><td class="p-2 text-right">¥${totalA.toLocaleString()}</td></tr></tfoot></table></div>
+        <button onclick="document.getElementById('channelModal').classList.add('hidden')" class="mt-4 w-full py-2 rounded-lg text-white font-bold" style="background:var(--green);">关闭</button></div>`;
         document.getElementById('channelModal').classList.remove('hidden');
-    };
-
-    window.closeChannelManager = function() {
-        document.getElementById('channelModal').classList.add('hidden');
-    };
-
-    window.addNewChannel = function() {
-        const input = document.getElementById('newChannelInput');
-        const channelName = input.value.trim();
-        if (!channelName) return;
-        alert(`✅ 渠道“${channelName}”已记录，将在下次订单中使用`);
-        input.value = '';
-    };
-
-    // ==================== 呼叫兼职弹窗 ====================
-    window.openCallPartTimer = function() {
+      };
+      window.openCallPartTimer = () => {
+        document.getElementById('callPartTimerModal').innerHTML = `
+        <div class="modal-box"><h2 class="text-lg font-bold mb-4">📣 一键呼叫外部兼职</h2>
+        <div class="space-y-3 text-sm"><div><label class="font-semibold">基础工费</label><input id="basePay" value="200" class="w-full px-3 py-2 border rounded-lg"></div>
+        <div><label class="font-semibold">风格</label><select id="style" class="w-full px-3 py-2 border rounded-lg"><optgroup label="化妆"><option>傣族重工</option><option>敦煌飞天</option><option>苗族银饰</option><option>大唐古风</option></optgroup><optgroup label="摄影"><option>暮光夜景</option><option>日系复古</option><option>新中式国潮</option></optgroup></select></div>
+        <div class="flex items-center gap-2"><input type="checkbox" id="commToggle" checked> <label>二消提成</label></div>
+        <div><label class="font-semibold">店员提成%</label><input id="commPer" value="20" class="w-full px-3 py-2 border rounded-lg"></div></div>
+        <button onclick="alert('已发布');document.getElementById('callPartTimerModal').classList.add('hidden')" class="mt-4 w-full py-2 rounded-lg text-white font-bold" style="background:var(--copper);">确认发布</button></div>`;
         document.getElementById('callPartTimerModal').classList.remove('hidden');
-    };
-    window.confirmCall = function() {
-        alert('📢 兼职呼叫已发布！提成比例仅接单成功后定向显示');
-        document.getElementById('callPartTimerModal').classList.add('hidden');
-    };
+      };
+      window.printOrder = (id) => {
+        const o = allOrders.find(x => x.id === id); if (!o) return;
+        const level = { standard: '标准精修', premium: '超精修', commercial: '商业精修' };
+        document.getElementById('printArea').innerHTML = `
+        <div style="font-family:'PingFang SC','Microsoft YaHei',sans-serif;"><h3 style="text-align:center;border-bottom:2px solid #000;padding-bottom:6px;">旅拍档期派 · 双联单据</h3>
+        <table class="print-table"><tr><td><b>流水号</b></td><td>${o.flowNumber}</td><td><b>渠道</b></td><td>${o.channel||'散客'}</td></tr>
+        <tr><td><b>客户</b></td><td>${o.name}</td><td><b>电话</b></td><td>${o.phone||'—'}</td></tr>
+        <tr><td><b>精修</b></td><td>${level[o.retouchLevel]}</td><td><b>加选</b></td><td>${o.extraPhotos}张</td></tr>
+        <tr><td><b>加选费</b></td><td>¥${o.extraCost}</td><td><b>押金</b></td><td>¥${o.depositAmount||0}</td></tr>
+        <tr><td><b>总金额</b></td><td style="font-weight:bold;">¥${o.totalAmount}</td><td><b>状态</b></td><td>${o.currentTrack==='track6'?'✅已结算':'🔄进行中'}</td></tr></table>
+        <div style="margin-top:12px;display:flex;justify-content:space-between;"><span>选片师：<span style="display:inline-block;width:100px;border-bottom:1px solid #000;"></span></span><span>客户：<span style="display:inline-block;width:100px;border-bottom:1px solid #000;"></span></span></div></div>`;
+        document.getElementById('printArea').style.display = 'block';
+        setTimeout(() => { window.print(); setTimeout(() => document.getElementById('printArea').style.display = 'none', 500); }, 200);
+      };
 
-    // ==================== 打印功能 ====================
-    window.printOrder = function(orderId) {
-        const order = allOrders.find(o => o.id === orderId);
-        if (!order) return;
-        const levelLabels = { standard: '标准精修', premium: '超精修', commercial: '商业精修' };
-        const printArea = document.getElementById('printArea');
-        printArea.innerHTML = `
-        <div style="font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:#000;">
-            <h3 style="text-align:center;margin:0 0 8px;font-size:14px;border-bottom:2px solid #000;padding-bottom:6px;">
-            旅拍档期派 · 双联电子单据</h3>
-            <table class="print-table">
-                <tr><td width="22%"><b>流水号</b></td><td width="28%">${order.flowNumber}</td><td width="22%"><b>渠道</b></td><td width="28%">${order.channel||'散客'}</td></tr>
-                <tr><td><b>客户姓名</b></td><td>${order.name}</td><td><b>电话</b></td><td>${order.phone||'—'}</td></tr>
-                <tr><td><b>业务类型</b></td><td>${order.type==='makeup_only'?'纯妆造':order.type==='photo_only'?'纯摄影':order.type==='rental'?'服装外借':'综合'}</td><td><b>定金</b></td><td>¥${order.deposit||0}</td></tr>
-                <tr><td><b>精修标准</b></td><td>${levelLabels[order.retouchLevel]||'标准精修'}</td><td><b>加选张数</b></td><td>${order.extraPhotos} 张</td></tr>
-                <tr><td><b>加选费用</b></td><td>¥${order.extraCost||0}</td><td><b>押金</b></td><td>¥${order.depositAmount||0}</td></tr>
-                <tr><td><b>总金额</b></td><td style="font-weight:bold;font-size:13px;">¥${order.totalAmount||0}</td><td><b>财务状态</b></td><td>${order.currentTrack==='track6'?'✅ 已结算':'🔄 进行中'}</td></tr>
-                <tr><td><b>特殊备注</b></td><td colspan="3">${order.type==='rental'?(order.rentalReturned?'衣服已归还':'⚠️ 衣服未还'):'—'}</td></tr>
-            </table>
-            <div style="margin-top:12px;display:flex;justify-content:space-between;font-size:11px;">
-                <span>选片师签名：<span class="print-signature"></span></span>
-                <span>客户签名：<span class="print-signature"></span></span>
-                <span>日期：____年____月____日</span>
-            </div>
-            <p style="text-align:center;font-size:9px;color:#999;margin-top:8px;">此单据为电子打印凭证 · 旅拍档期派商家控制台</p>
-        </div>`;
-        printArea.style.display = 'block';
-        setTimeout(() => {
-            window.print();
-            setTimeout(() => {
-                printArea.style.display = 'none';
-            }, 500);
-        }, 200);
-    };
-
-    // ==================== 键盘事件 ====================
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && document.activeElement === document.getElementById('quickInput')) {
-            e.preventDefault();
-            handleQuickInput();
-        }
-    });
-
-    // ==================== 初始化 ====================
-    async function init() {
+      // ==================== 启动 ====================
+      (async () => {
         await openDB();
-        await loadAllData();
-        const today = new Date().toISOString().split('T')[0];
-        let needsSave = false;
-        allOrders.forEach(o => {
-            if (!o.date) { o.date = today;
-                needsSave = true; }
-            if (o.rentalDepositPaid === undefined) { o.rentalDepositPaid = false;
-                needsSave = true; }
-            if (o.extraPhotos === undefined) { o.extraPhotos = 0;
-                needsSave = true; }
-            if (o.extraCost === undefined) { o.extraCost = 0;
-                needsSave = true; }
-            if (o.totalAmount === undefined) { o.totalAmount = (o.deposit || 0);
-                needsSave = true; }
-        });
-        if (needsSave) {
-            for (const o of allOrders) await saveOrder(o);
-        }
-        recalcStaffLoads();
-        checkAuthOnLoad();
-        if (currentRole) {
-            applyRolePermissions();
-            renderAll();
-        }
-        document.getElementById('quickInput').focus();
-    }
-
-    init().catch(err => {
-        console.error('初始化失败:', err);
-        allStaff = getDefaultStaff();
-        allOrders = getDefaultOrders();
-        todayFlowCounter = allOrders.length;
-        recalcStaffLoads();
-        checkAuthOnLoad();
-        renderAll();
-        document.getElementById('quickInput').focus();
-    });
-})();
-</script>
+        await loadInitialData();
+        const saved = sessionStorage.getItem('role');
+        if (saved === 'boss' || saved === 'staff') { role = saved; document.getElementById('authOverlay').classList.add('hidden'); applyRole(); }
+        document.getElementById('quickInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleQuickInput(); });
+        refreshDashboard();
+      })();
+    })();
+  </script>
 </body>
 </html>
