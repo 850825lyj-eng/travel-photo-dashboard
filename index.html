@@ -76,10 +76,15 @@
     @media print {
       body * { visibility:hidden!important; }
       #printArea, #printArea * { visibility:visible!important; }
-      #printArea { position:fixed!important; left:0; top:0; width:100%; max-width:297mm; padding:8mm; background:#fff; z-index:99999; font-size:10px; }
+      #printArea {
+        position:fixed!important; left:0; top:0; width:100%; max-width:297mm; padding:8mm; background:#fff; z-index:99999; font-size:10px;
+        display:flex; flex-direction:row; gap:2mm;
+      }
+      #printArea .print-half { width:48%; border-right:1px dashed #aaa; padding-right:2mm; }
+      #printArea .print-half:last-child { border-right:none; padding-left:2mm; }
       #printArea table { width:100%; border-collapse:collapse; }
       #printArea td { border:0.5px solid #999; padding:4px; }
-      @page { size:A4 landscape; margin:2mm; }
+      @page { size:A4 landscape; margin:10mm; }
     }
   </style>
 </head>
@@ -127,7 +132,6 @@
 
 <!-- 主体区域 -->
 <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
-  <!-- 运力墙 -->
   <aside class="staff-wall lg:w-[14%] lg:min-w-[160px] w-full lg:max-w-[190px] flex-shrink-0 overflow-y-auto lg:overflow-y-auto lg:h-full h-auto max-h-[110px] lg:max-h-full overflow-x-auto lg:overflow-x-hidden p-3 gap-2 flex flex-row lg:flex-col" id="staffWall">
     <div class="flex lg:flex-col gap-2 w-full">
       <div class="text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">💄 化妆师</div>
@@ -148,7 +152,6 @@
     </div>
   </aside>
 
-  <!-- 轨道区 -->
   <main class="flex-1 flex flex-col overflow-hidden">
     <div class="lg:hidden flex gap-1 p-2 overflow-x-auto bg-white/50 backdrop-blur-sm" id="mobileTabs">
       <button class="tab-btn px-3 py-1 rounded-full text-xs font-semibold bg-gray-100" data-track="track1">📋到店</button>
@@ -211,17 +214,16 @@
   </div>
 </div>
 
-<!-- 打印区 -->
 <div id="printArea" style="display:none;"></div>
 
 <script>
 (() => {
   // ========== IndexedDB ==========
-  const DB_NAME = 'TravelSchedulerV11';
+  const DB_NAME = 'TravelSchedulerV12';
   let db;
   function openDB() {
     return new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, 2);
+      const req = indexedDB.open(DB_NAME, 3);
       req.onupgradeneeded = (e) => {
         const d = e.target.result;
         if (!d.objectStoreNames.contains('orders')) d.createObjectStore('orders', { keyPath: 'id' });
@@ -270,7 +272,7 @@
     });
   }
 
-  // ========== 权限与登录 ==========
+  // ========== 权限 ==========
   const PASS = { staff: 'staff888', boss: 'boss999' };
   let role = null;
   function applyRole() {
@@ -330,7 +332,7 @@
     refreshDashboard();
   };
 
-  // ========== 新客录入模态 ==========
+  // ========== 新客录入 ==========
   window.openNewOrderModal = () => {
     document.getElementById('newOrderName').value = '';
     document.getElementById('newOrderPhone').value = '';
@@ -357,8 +359,9 @@
       name, phone, deposit, channel, paymentMethod: payment, type: 'comprehensive',
       currentTrack: 'track1', timestamp: Date.now(), wechatAdded: false,
       makeupArtistId: null, photographerId: null, depositAmount: 0, rentalReturned: false,
-      extraPhotos: 0, retouchLevel: 'standard', extraCost: 0, totalAmount: deposit,
-      date: today, rentalDepositPaid: false
+      extraPhotos: 0, retouchLevel: 'standard', extraCost: 0,
+      finalPayment: 0, finalPaymentMethod: '', finalSettled: false,
+      totalAmount: deposit, date: today, rentalDepositPaid: false
     };
     await dbPut('orders', newOrder);
     closeNewOrderModal();
@@ -389,8 +392,8 @@
   function defOrders() {
     const t = new Date().toISOString().split('T')[0];
     return [
-      { id:'o1', flowNumber:'#001', name:'张美琳', phone:'13800001111', deposit:300, channel:'美团', type:'comprehensive', currentTrack:'track1', timestamp:Date.now()-3600000, wechatAdded:false, makeupArtistId:null, photographerId:null, depositAmount:0, rentalReturned:false, extraPhotos:0, retouchLevel:'standard', extraCost:0, totalAmount:300, date:t, rentalDepositPaid:false, paymentMethod:'微信' },
-      { id:'o2', flowNumber:'#002', name:'李思远', phone:'13900002222', deposit:500, channel:'导游小陈', type:'photo_only', currentTrack:'track4', timestamp:Date.now()-1800000, wechatAdded:true, makeupArtistId:null, photographerId:'staff_p1', depositAmount:0, rentalReturned:false, extraPhotos:5, retouchLevel:'premium', extraCost:300, totalAmount:800, date:t, rentalDepositPaid:false, paymentMethod:'支付宝' }
+      { id:'o1', flowNumber:'#001', name:'张美琳', phone:'13800001111', deposit:300, channel:'美团', type:'comprehensive', currentTrack:'track1', timestamp:Date.now()-3600000, wechatAdded:false, makeupArtistId:null, photographerId:null, depositAmount:0, rentalReturned:false, extraPhotos:0, retouchLevel:'standard', extraCost:0, finalPayment:0, finalPaymentMethod:'', finalSettled:false, totalAmount:300, date:t, rentalDepositPaid:false, paymentMethod:'微信' },
+      { id:'o2', flowNumber:'#002', name:'李思远', phone:'13900002222', deposit:500, channel:'导游小陈', type:'photo_only', currentTrack:'track4', timestamp:Date.now()-1800000, wechatAdded:true, makeupArtistId:null, photographerId:'staff_p1', depositAmount:0, rentalReturned:false, extraPhotos:5, retouchLevel:'premium', extraCost:300, finalPayment:0, finalPaymentMethod:'', finalSettled:false, totalAmount:800, date:t, rentalDepositPaid:false, paymentMethod:'支付宝' }
     ];
   }
 
@@ -437,7 +440,11 @@
 
   function updateRevenue() {
     const today = new Date().toISOString().split('T')[0];
-    const total = allOrders.filter(o=>o.date===today).reduce((s,o)=>s+(o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0),0);
+    const total = allOrders.filter(o=>o.date===today).reduce((s,o)=> {
+      let amount = (o.deposit||0) + (o.extraCost||0) + (o.depositAmount||0);
+      if (o.finalSettled) amount += (o.finalPayment||0);
+      return s + amount;
+    }, 0);
     document.getElementById('todayRevenue').textContent = '¥'+total.toLocaleString();
   }
 
@@ -475,7 +482,7 @@
     pList.innerHTML = allStaff.filter(s=>s.role==='photo').map(build).join('')||'<span class="text-xs text-gray-400">暂无</span>';
   }
 
-  // ========== 轨道渲染（六轨全量，独立滚动） ==========
+  // ========== 轨道渲染 ==========
   function renderTracks() {
     const container = document.getElementById('trackContainer');
     let html = '';
@@ -489,8 +496,7 @@
       if (track.key==='selection') {
         extraHeader = `
         <div class="mt-2 flex flex-col gap-1 text-xs bg-gray-50 rounded-lg p-2 border">
-          <div class="flex items-center gap-2">
-            <span class="font-semibold">模式</span>
+          <div class="flex items-center gap-2"><span class="font-semibold">模式</span>
             <select onchange="updateSetting('selectionMode',this.value)" class="border rounded px-1 py-0.5 text-xs">
               <option value="inStore" ${settings.selectionMode==='inStore'?'selected':''}>店内</option>
               <option value="remote" ${settings.selectionMode==='remote'?'selected':''}>离店</option>
@@ -545,7 +551,7 @@
       rental = !o.rentalDepositPaid ? `<div class="text-xs text-copper mt-1">⚠️押金未登记 <button class="btn-action btn-copper" onclick="event.stopPropagation();openDeposit('${o.id}')">登记</button></div>` : `<div class="text-xs text-green-600 mt-1">✅已收押金¥${o.depositAmount} ${o.rentalReturned?'已还':'未还'} ${!o.rentalReturned?`<button class="btn-action btn-green ml-1" onclick="event.stopPropagation();returnRental('${o.id}')">归还</button>`:''}</div>`;
     }
 
-    // 选片计价器（grid死锁，绝不换行）
+    // 选片计价器（grid死锁不换行）
     let price = '';
     if (track.key==='selection' && settings.selectionMode==='inStore') {
       price = `<div class="mt-2 grid grid-cols-[1fr_auto_auto] items-center gap-1.5 w-full text-xs font-semibold overflow-hidden flex-nowrap" onclick="event.stopPropagation()">
@@ -580,6 +586,30 @@
       </select>` : '<span class="text-xs text-gray-400">无摄影师</span>';
     }
 
+    // 尾款组件（选片与交付轨道均显示）
+    let finalPaymentHTML = '';
+    if (track.key==='selection' || track.key==='delivery') {
+      finalPaymentHTML = `<div class="mt-2 grid grid-cols-[1fr_auto] gap-2 text-xs items-center bg-gray-50 rounded-lg p-2 border" onclick="event.stopPropagation()">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold">尾款</span>
+            <input type="number" value="${o.finalPayment||0}" class="w-20 border rounded px-1 py-0.5 no-spin" onchange="updateFinalPayment('${o.id}', this.value)">
+            <select class="border rounded px-1 py-0.5" onchange="updateFinalPaymentMethod('${o.id}', this.value)">
+              <option value="">支付</option>
+              <option value="微信" ${o.finalPaymentMethod==='微信'?'selected':''}>微信</option>
+              <option value="支付宝" ${o.finalPaymentMethod==='支付宝'?'selected':''}>支付宝</option>
+              <option value="现金" ${o.finalPaymentMethod==='现金'?'selected':''}>现金</option>
+              <option value="刷卡" ${o.finalPaymentMethod==='刷卡'?'selected':''}>刷卡</option>
+            </select>
+          </div>
+          <label class="flex items-center gap-1 cursor-pointer">
+            <input type="checkbox" ${o.finalSettled?'checked':''} onchange="toggleFinalSettled('${o.id}', this.checked)">
+            <span>✓ 尾款已结清</span>
+          </label>
+        </div>
+      </div>`;
+    }
+
     const nextTrack = getNextTrack(track.id);
     const canMove = checkMovePermission(o, track.id);
     let moveBtn = '';
@@ -597,7 +627,7 @@
         <span>📱${o.phone||'无'}</span>${phoneStatus}${nameStatus}
         <span>💰定金¥${o.deposit||0}</span>${payStatus}
       </div>
-      ${wechat}${rental}${price}${assignDropdown}
+      ${wechat}${rental}${price}${assignDropdown}${finalPaymentHTML}
       <div class="flex flex-wrap gap-1 mt-2">
         ${moveBtn}
         ${(track.key==='selection'||track.key==='delivery')?`<button class="btn-action" onclick="event.stopPropagation();printOrder('${o.id}')">🖨️打印</button>`:''}
@@ -611,6 +641,20 @@
     if (!o.name || o.name==='匿名散客' || !o.phone) return false;
     return true;
   }
+
+  // ========== 尾款操作函数 ==========
+  window.updateFinalPayment = async (orderId, val) => {
+    const o = allOrders.find(x=>x.id===orderId);
+    if (o) { o.finalPayment = parseFloat(val)||0; await dbPut('orders', o); refreshDashboard(); }
+  };
+  window.updateFinalPaymentMethod = async (orderId, method) => {
+    const o = allOrders.find(x=>x.id===orderId);
+    if (o) { o.finalPaymentMethod = method; await dbPut('orders', o); refreshDashboard(); }
+  };
+  window.toggleFinalSettled = async (orderId, checked) => {
+    const o = allOrders.find(x=>x.id===orderId);
+    if (o) { o.finalSettled = checked; await dbPut('orders', o); refreshDashboard(); }
+  };
 
   // ========== 信息补全弹窗 ==========
   window.openInfoPatchModal = (orderId) => {
@@ -657,7 +701,7 @@
     if (!channel) channel = '散客';
     o.name = name || '匿名散客'; o.phone = phone; o.deposit = deposit;
     o.paymentMethod = payment || null; o.channel = channel;
-    o.totalAmount = deposit + (o.extraCost||0) + (o.depositAmount||0);
+    o.totalAmount = deposit + (o.extraCost||0) + (o.depositAmount||0) + (o.finalSettled ? (o.finalPayment||0) : 0);
     await dbPut('orders', o);
     closeModal();
     refreshDashboard();
@@ -708,7 +752,11 @@
   window.returnRental = async (orderId) => { const o = allOrders.find(x=>x.id===orderId); if(o){ o.rentalReturned=true; await dbPut('orders',o); refreshDashboard(); } };
   window.setRetouch = async (orderId, level) => { const o = allOrders.find(x=>x.id===orderId); if(o){ o.retouchLevel=level; calcExtra(o); await dbPut('orders',o); refreshDashboard(); } };
   window.changeExtra = async (orderId, delta) => { const o = allOrders.find(x=>x.id===orderId); if(o){ o.extraPhotos=Math.max(0,(o.extraPhotos||0)+delta); calcExtra(o); await dbPut('orders',o); refreshDashboard(); } };
-  function calcExtra(o) { const map={standard:settings.priceStandard,premium:settings.pricePremium,commercial:settings.priceCommercial}; o.extraCost=o.extraPhotos*(map[o.retouchLevel]||settings.priceStandard); o.totalAmount=(o.deposit||0)+o.extraCost+(o.depositAmount||0); }
+  function calcExtra(o) {
+    const map={standard:settings.priceStandard,premium:settings.pricePremium,commercial:settings.priceCommercial};
+    o.extraCost=o.extraPhotos*(map[o.retouchLevel]||settings.priceStandard);
+    o.totalAmount=(o.deposit||0)+o.extraCost+(o.depositAmount||0)+(o.finalSettled?(o.finalPayment||0):0);
+  }
 
   window.updateSetting = async (key, val) => {
     settings[key] = isNaN(parseFloat(val)) ? val : parseFloat(val);
@@ -718,7 +766,7 @@
     refreshDashboard();
   };
 
-  // ========== 渠道对账（刚性轧账 + 渠道返佣配置） ==========
+  // ========== 渠道对账（刚性轧账 + 日报表下载） ==========
   window.openChannelReport = async () => {
     const today = new Date().toISOString().split('T')[0];
     const orders = allOrders.filter(o=>o.date===today);
@@ -726,11 +774,11 @@
     let totalRevenue = 0;
     orders.forEach(o => {
       const pm = o.paymentMethod || '未知';
-      payStats[pm] = (payStats[pm]||0) + (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0);
+      payStats[pm] = (payStats[pm]||0) + (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0)+(o.finalSettled?(o.finalPayment||0):0);
       const ch = o.channel||'散客';
       if(!chanStats[ch]) chanStats[ch]={count:0,total:0};
-      chanStats[ch].count++; chanStats[ch].total += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0);
-      totalRevenue += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0);
+      chanStats[ch].count++; chanStats[ch].total += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0)+(o.finalSettled?(o.finalPayment||0):0);
+      totalRevenue += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0)+(o.finalSettled?(o.finalPayment||0):0);
     });
     const calls = await dbGetAll('partTimerCalls');
     const todayCalls = calls.filter(c => c.date === today);
@@ -745,7 +793,6 @@
         totalPartTimerCost += (c.lashFee||0) + (c.pupilFee||0) + (c.makeupUpgrade||0);
       }
     });
-    // 渠道返佣
     const channelCommissions = await dbGetAll('channelCommissions');
     const commMap = {};
     channelCommissions.forEach(c => commMap[c.channel] = c);
@@ -753,11 +800,8 @@
     Object.entries(chanStats).forEach(([ch, data]) => {
       const cfg = commMap[ch];
       if (cfg) {
-        if (cfg.type === 'percent') {
-          totalChannelRebate += data.total * (cfg.value / 100);
-        } else if (cfg.type === 'fixed') {
-          totalChannelRebate += data.count * cfg.value;
-        }
+        if (cfg.type === 'percent') totalChannelRebate += data.total * (cfg.value / 100);
+        else if (cfg.type === 'fixed') totalChannelRebate += data.count * cfg.value;
       }
     });
     const netProfit = totalRevenue - totalPartTimerCost - totalChannelRebate;
@@ -766,14 +810,10 @@
     for(const [k,v] of Object.entries(payStats)) payHtml+=`<tr><td class="p-1">${k}</td><td class="text-right">¥${v.toLocaleString()}</td></tr>`;
     for(const [k,v] of Object.entries(chanStats)) {
       const cfg = commMap[k];
-      let rebateInfo = '';
-      if (cfg) {
-        rebateInfo = cfg.type === 'percent' ? `(${cfg.value}%扣点)` : `(¥${cfg.value}/单)`;
-      } else {
-        rebateInfo = '<span class="text-gray-400">未设返佣</span>';
-      }
+      let rebateInfo = cfg ? (cfg.type==='percent'?`(${cfg.value}%扣点)`:`(¥${cfg.value}/单)`) : '<span class="text-gray-400">未设返佣</span>';
       chanHtml += `<tr class="border-b"><td class="p-1">${k} ${rebateInfo}</td><td class="text-right">${v.count}单</td><td class="text-right">¥${v.total.toLocaleString()}</td></tr>`;
     }
+
     // 渠道返佣编辑区
     let commissionConfigHtml = '';
     const allChannels = Object.keys(chanStats);
@@ -782,11 +822,11 @@
       commissionConfigHtml += `
       <div class="flex items-center gap-2 mb-1 text-xs">
         <span class="w-20 truncate">${ch}</span>
-        <select id="commType_${ch}" class="border rounded px-1 py-0.5" onchange="document.getElementById('commVal_${ch}').placeholder = this.value==='percent'?'%': '¥'">
+        <select id="commType_${ch}" class="border rounded px-1 py-0.5">
           <option value="percent" ${cfg.type==='percent'?'selected':''}>扣点%</option>
           <option value="fixed" ${cfg.type==='fixed'?'selected':''}>固定/单</option>
         </select>
-        <input id="commVal_${ch}" type="number" value="${cfg.value}" class="w-16 border rounded px-1 py-0.5 no-spin" placeholder="${cfg.type==='percent'?'%':'¥'}">
+        <input id="commVal_${ch}" type="number" value="${cfg.value}" class="w-16 border rounded px-1 py-0.5 no-spin">
       </div>`;
     });
 
@@ -801,7 +841,7 @@
           ${commissionConfigHtml || '<p class="text-xs text-gray-400">今日无渠道数据</p>'}
         </div>
         <div class="text-xs space-y-1 mb-3">
-          <div class="flex justify-between"><span>今日总流水 (定金+加选+押金)</span><span class="font-bold">¥${totalRevenue.toLocaleString()}</span></div>
+          <div class="flex justify-between"><span>今日总流水 (定金+加选+尾款)</span><span class="font-bold">¥${totalRevenue.toLocaleString()}</span></div>
           <div class="flex justify-between"><span>渠道总返佣</span><span class="text-copper">-¥${totalChannelRebate.toLocaleString()}</span></div>
           <div class="flex justify-between"><span>应付兼职总工费 (${todayCalls.length}单)</span><span class="text-copper">-¥${totalPartTimerCost.toLocaleString()}</span></div>
           <div class="flex justify-between border-t pt-1 mt-1 font-bold text-base"><span>今日门店纯利润</span><span style="color:var(--green);">¥${netProfit.toLocaleString()}</span></div>
@@ -809,9 +849,10 @@
         <p class="font-semibold text-sm">客源渠道统计</p>
         <table class="w-full text-xs">${chanHtml||'<tr><td colspan="3">无</td></tr>'}</table>
       </div>
-      <div class="flex justify-end gap-2 mt-3">
+      <div class="flex flex-wrap gap-2 justify-end mt-3">
         <button class="btn-action" onclick="saveChannelCommissions()">保存返佣设置</button>
-        <button class="btn-action btn-green" onclick="closeModal()">关闭</button>
+        <button class="btn-action btn-green" onclick="downloadDailyReport()">📊 导出今日财务日报表</button>
+        <button class="btn-action" onclick="closeModal()">关闭</button>
       </div>`;
     document.getElementById('customModal').classList.remove('hidden');
   };
@@ -820,25 +861,44 @@
     const today = new Date().toISOString().split('T')[0];
     const orders = allOrders.filter(o=>o.date===today);
     const chanStats = {};
-    orders.forEach(o => {
-      const ch = o.channel||'散客';
-      if(!chanStats[ch]) chanStats[ch] = true;
-    });
+    orders.forEach(o => { chanStats[o.channel||'散客'] = true; });
     for (const ch of Object.keys(chanStats)) {
       const typeEl = document.getElementById(`commType_${ch}`);
       const valEl = document.getElementById(`commVal_${ch}`);
       if (typeEl && valEl) {
-        const type = typeEl.value;
-        const value = parseFloat(valEl.value) || 0;
-        await dbPut('channelCommissions', { channel: ch, type, value });
+        await dbPut('channelCommissions', { channel: ch, type: typeEl.value, value: parseFloat(valEl.value)||0 });
       }
     }
     closeModal();
-    showModal('保存成功', '渠道返佣设置已更新，纯利润将重新计算。');
-    openChannelReport(); // 刷新报表
+    showModal('保存成功', '渠道返佣设置已更新。');
+    openChannelReport();
   };
 
-  // ========== 呼叫兼职（工种细分+动态工费） ==========
+  window.downloadDailyReport = async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const orders = allOrders.filter(o=>o.date===today);
+    const payStats = {}, chanStats = {};
+    orders.forEach(o => {
+      const pm = o.paymentMethod || '未知';
+      payStats[pm] = (payStats[pm]||0) + (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0)+(o.finalSettled?(o.finalPayment||0):0);
+      const ch = o.channel||'散客';
+      if(!chanStats[ch]) chanStats[ch]={count:0,total:0};
+      chanStats[ch].count++; chanStats[ch].total += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0)+(o.finalSettled?(o.finalPayment||0):0);
+    });
+    const calls = await dbGetAll('partTimerCalls');
+    const todayCalls = calls.filter(c => c.date === today);
+    const comms = await dbGetAll('channelCommissions');
+    const report = { date: today, orders, paymentSummary: payStats, channelSummary: chanStats, partTimerCalls: todayCalls, channelCommissions: comms };
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}年${String(now.getMonth()+1).padStart(2,'0')}月${String(now.getDate()).padStart(2,'0')}日`;
+    const a = document.createElement('a'); a.href = url; a.download = `旅拍档期派财务日报表_${dateStr}.json`; a.click();
+    URL.revokeObjectURL(url);
+    showModal('下载成功', `报表已保存为：旅拍档期派财务日报表_${dateStr}.json`);
+  };
+
+  // ========== 呼叫兼职 ==========
   window.openCallModal = () => {
     const content = document.getElementById('customModalContent');
     content.innerHTML = `<h3 class="font-bold text-lg mb-3">📣 呼叫外部兼职 (潮汐客流突发应急)</h3>
@@ -885,7 +945,6 @@
     if (roleEl && roleEl.value === 'makeup') { makeupDiv.classList.remove('hidden'); photoDiv.classList.add('hidden'); }
     else { makeupDiv.classList.add('hidden'); photoDiv.classList.remove('hidden'); }
   };
-
   window.toggleMakeupMode = () => {
     const modeEl = document.querySelector('input[name="makeupMode"]:checked');
     const secondaryItems = document.getElementById('secondaryItems');
@@ -893,7 +952,6 @@
     if (modeEl && modeEl.value === 'secondary') { secondaryItems.classList.remove('hidden'); percentArea.classList.add('hidden'); }
     else { secondaryItems.classList.add('hidden'); percentArea.classList.remove('hidden'); }
   };
-
   window.confirmCall = async () => {
     const roleEl = document.querySelector('input[name="callRole"]:checked');
     const role = roleEl ? roleEl.value : 'makeup';
@@ -913,7 +971,7 @@
         callRecord.lashFee = parseFloat(document.getElementById('lashFee')?.value) || 0;
         callRecord.pupilFee = parseFloat(document.getElementById('pupilFee')?.value) || 0;
         callRecord.makeupUpgrade = parseFloat(document.getElementById('makeupUpgrade')?.value) || 0;
-        commissionDesc = `二消分成(睫毛¥${callRecord.lashFee} 美瞳¥${callRecord.pupilFee} 彩妆升级¥${callRecord.makeupUpgrade})`;
+        commissionDesc = `二消(睫毛¥${callRecord.lashFee} 美瞳¥${callRecord.pupilFee} 彩妆¥${callRecord.makeupUpgrade})`;
       } else {
         callRecord.secondaryCommission = false;
         callRecord.commissionPercent = parseFloat(document.getElementById('makeupPercent')?.value) || 20;
@@ -922,15 +980,39 @@
     }
     await dbPut('partTimerCalls', callRecord);
     closeModal();
-    const roleName = role === 'makeup' ? '外部化妆师' : '外部摄影师';
-    showModal('发布成功', `已发布：${roleName}，${style}风格，工费¥${basePay}，${commissionDesc}。提成规则已锁定，对账时自动结算。`);
+    showModal('发布成功', `已发布：${role==='makeup'?'外部化妆师':'外部摄影师'}，${style}，工费¥${basePay}，${commissionDesc}。提成规则已锁定。`);
   };
 
-  // ========== 打印 ==========
+  // ========== 打印（双联A4横版） ==========
   window.printOrder = (orderId) => {
     const o = allOrders.find(x=>x.id===orderId); if(!o) return;
     const level = {standard:'标准精修',premium:'超精修',commercial:'商业精修'};
-    document.getElementById('printArea').innerHTML = `<div style="font-family:'PingFang SC','Microsoft YaHei',sans-serif;"><h3 style="text-align:center;border-bottom:2px solid #000;">旅拍档期派 · 双联单据</h3><table class="print-table"><tr><td><b>流水号</b></td><td>${o.flowNumber}</td><td><b>渠道</b></td><td>${o.channel}</td></tr><tr><td><b>客户</b></td><td>${o.name}</td><td><b>电话</b></td><td>${o.phone}</td></tr><tr><td><b>精修</b></td><td>${level[o.retouchLevel]}</td><td><b>加选</b></td><td>${o.extraPhotos}张</td></tr><tr><td><b>加选费</b></td><td>¥${o.extraCost}</td><td><b>押金</b></td><td>¥${o.depositAmount||0}</td></tr><tr><td><b>总金额</b></td><td>¥${o.totalAmount}</td><td><b>状态</b></td><td>${o.currentTrack==='track6'?'已结算':'进行中'}</td></tr></table><div style="margin-top:12px;display:flex;justify-content:space-between;"><span>选片师：________</span><span>客户：________</span></div></div>`;
+    const halfTemplate = (title) => `
+      <div class="print-half">
+        <h4 style="text-align:center;font-size:12px;font-weight:bold;margin-bottom:4px;">${title}</h4>
+        <table class="print-table">
+          <tr><td><b>流水号</b></td><td>${o.flowNumber}</td></tr>
+          <tr><td><b>客户</b></td><td>${o.name}</td></tr>
+          <tr><td><b>电话</b></td><td>${o.phone||'—'}</td></tr>
+          <tr><td><b>渠道</b></td><td>${o.channel||'散客'}</td></tr>
+          <tr><td><b>化妆师</b></td><td>${o.makeupArtistId ? (allStaff.find(s=>s.id===o.makeupArtistId)?.name||'') : '—'}</td></tr>
+          <tr><td><b>摄影师</b></td><td>${o.photographerId ? (allStaff.find(s=>s.id===o.photographerId)?.name||'') : '—'}</td></tr>
+          <tr><td><b>选片模式</b></td><td>${settings.selectionMode==='inStore'?'店内':'离店'}</td></tr>
+          <tr><td><b>精修标准</b></td><td>${level[o.retouchLevel]}</td></tr>
+          <tr><td><b>超选张数</b></td><td>${o.extraPhotos}张</td></tr>
+          <tr><td><b>加选金额</b></td><td>¥${o.extraCost||0}</td></tr>
+          <tr><td><b>定金</b></td><td>¥${o.deposit||0}</td></tr>
+          <tr><td><b>尾款</b></td><td>¥${o.finalPayment||0} ${o.finalSettled?'(已结)':'(未结)'}</td></tr>
+          <tr><td><b>总金额</b></td><td>¥${o.totalAmount||0}</td></tr>
+        </table>
+        <div style="margin-top:8px;font-size:10px;">选片师签名：________</div>
+        <div style="margin-top:4px;font-size:10px;">客户签名：________</div>
+      </div>`;
+    document.getElementById('printArea').innerHTML = `
+      <div style="display:flex;width:100%;font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
+        ${halfTemplate('门店留底联')}
+        ${halfTemplate('客户确认联')}
+      </div>`;
     document.getElementById('printArea').style.display = 'block';
     setTimeout(() => { window.print(); setTimeout(() => document.getElementById('printArea').style.display = 'none', 500); }, 200);
   };
@@ -965,9 +1047,7 @@
         for (const c of (backup.channelCommissions || [])) await dbPut('channelCommissions', c);
         showModal('导入成功', '历史备份已一键恢复，正在刷新视图');
         refreshDashboard();
-      } catch (err) {
-        showModal('导入失败', '文件格式不正确或数据已损坏');
-      }
+      } catch (err) { showModal('导入失败', '文件格式不正确或数据已损坏'); }
     };
     input.click();
   };
