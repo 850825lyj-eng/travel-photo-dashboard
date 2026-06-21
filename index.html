@@ -55,7 +55,7 @@
     }
     .modal-box {
       background:#fff; border-radius:20px; padding:24px; box-shadow:var(--shadow-lg);
-      max-width:580px; width:90%; max-height:85vh; overflow-y:auto; animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      max-width:620px; width:90%; max-height:85vh; overflow-y:auto; animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
     }
     @keyframes fadeIn { from{opacity:0} to{opacity:1} }
     @keyframes slideUp { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
@@ -77,7 +77,7 @@
 </head>
 <body class="h-screen flex flex-col">
 
-<!-- 登录遮罩 -->
+<!-- ==================== 登录遮罩 ==================== -->
 <div id="authOverlay" class="fixed inset-0 z-[99999] flex items-center justify-center bg-white/80 backdrop-blur-xl">
   <div class="bg-white rounded-3xl shadow-2xl p-8 w-80 text-center">
     <div class="text-3xl font-bold mb-2" style="color:var(--green);">旅拍档期派</div>
@@ -88,7 +88,7 @@
   </div>
 </div>
 
-<!-- 顶部导航（总控枢纽内聚设计） -->
+<!-- ==================== 顶部导航（总控枢纽内聚设计） ==================== -->
 <header class="topnav-glass flex items-center justify-between px-4 md:px-6 py-3 flex-shrink-0 gap-4">
   <div class="flex items-center gap-3 flex-shrink-0">
     <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-white font-extrabold text-sm shadow-md" style="background:linear-gradient(135deg,#00C853,#00a844);">派</div>
@@ -98,24 +98,27 @@
     </div>
   </div>
   <button onclick="openCallModal()" class="px-4 py-2 rounded-full font-bold text-sm flex items-center justify-center shadow-md transition hover:shadow-lg border-2" style="background:#FFFDE7; border-color:var(--yellow); color:#1a1a2e;">
-    📢 呼叫外部兼职
+    📢 呼叫外部兼职 (潮汐客流突发应急)
   </button>
   <div class="flex items-center gap-3 flex-shrink-0">
     <div class="text-right">
       <span class="text-xs text-gray-500 block">今日营业额</span>
       <span class="text-xl md:text-2xl font-extrabold tracking-tight" style="color:var(--green);" id="todayRevenue">¥0</span>
     </div>
-    <button onclick="openChannelReport()" id="channelBtn" class="text-xs text-gray-600 hover:text-gray-900 font-medium transition">渠道</button>
-    <button onclick="exportBackup()" class="text-xs text-gray-500 hover:text-gray-700 font-medium transition">📥 导出</button>
-    <button onclick="importBackup()" class="text-xs text-gray-500 hover:text-gray-700 font-medium transition">📤 导入</button>
-    <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-500 font-medium transition">退出</button>
+    <!-- 轻奢总控台控制仓 -->
+    <div class="flex items-center space-x-1 p-1 bg-slate-50 border border-slate-200/60 rounded-xl">
+      <button onclick="openChannelReport()" id="channelBtn" class="px-3 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:text-[#00C853] hover:bg-white transition">渠道</button>
+      <button onclick="exportBackup()" class="px-3 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:text-[#00C853] hover:bg-white transition">📥 导出</button>
+      <button onclick="importBackup()" class="px-3 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:text-[#00C853] hover:bg-white transition">📤 导入</button>
+      <button onclick="logout()" class="px-3 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:text-red-500 hover:bg-white transition">退出</button>
+    </div>
     <button onclick="openNewOrderModal()" class="px-4 py-2.5 rounded-xl text-white font-bold text-sm flex items-center gap-1 shadow-md hover:shadow-lg transition" style="background:var(--green);">
       ➕ 新客签到录入
     </button>
   </div>
 </header>
 
-<!-- 主体区域 -->
+<!-- ==================== 主体区域 ==================== -->
 <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
   <!-- 左侧运力墙 -->
   <aside class="staff-wall lg:w-[14%] lg:min-w-[160px] w-full lg:max-w-[190px] flex-shrink-0 overflow-y-auto lg:overflow-y-auto lg:h-full h-auto max-h-[110px] lg:max-h-full overflow-x-auto lg:overflow-x-hidden p-3 gap-2 flex flex-row lg:flex-col" id="staffWall">
@@ -138,7 +141,7 @@
     </div>
   </aside>
 
-  <!-- 中部轨道区 -->
+  <!-- 中部轨道区（六轨等宽平铺） -->
   <main class="flex-1 flex flex-col overflow-hidden">
     <div class="lg:hidden flex gap-1 p-2 overflow-x-auto bg-white/50 backdrop-blur-sm" id="mobileTabs">
       <button class="tab-btn px-3 py-1 rounded-full text-xs font-semibold bg-gray-100" data-track="track1">📋到店</button>
@@ -155,12 +158,12 @@
   </main>
 </div>
 
-<!-- 自定义模态窗 -->
+<!-- ==================== 自定义模态窗 ==================== -->
 <div id="customModal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
   <div class="modal-box text-center" id="customModalContent"></div>
 </div>
 
-<!-- 添加技师模态窗 -->
+<!-- ==================== 添加技师模态窗 ==================== -->
 <div id="addStaffModal" class="modal-overlay hidden" onclick="if(event.target===this)closeAddStaffModal()">
   <div class="modal-box text-center">
     <h3 class="font-bold text-lg mb-4">➕ 添加人员</h3>
@@ -173,7 +176,7 @@
   </div>
 </div>
 
-<!-- 新客录入模态窗 -->
+<!-- ==================== 新客录入模态窗 ==================== -->
 <div id="newOrderModal" class="modal-overlay hidden" onclick="if(event.target===this)closeNewOrderModal()">
   <div class="modal-box text-sm text-left">
     <h3 class="font-bold text-lg mb-4 text-center">➕ 新客签到录入</h3>
@@ -202,13 +205,14 @@
   </div>
 </div>
 
-<!-- 打印区 -->
+<!-- ==================== 打印区 ==================== -->
 <div id="printArea" style="display:none;"></div>
 
+<!-- ==================== 全量 JavaScript 逻辑 ==================== -->
 <script>
 (() => {
-  // ========== IndexedDB ==========
-  const DB_NAME = 'TravelSchedulerV8';
+  // ========== IndexedDB 封装 ==========
+  const DB_NAME = 'TravelSchedulerV9';
   let db;
   function openDB() {
     return new Promise((resolve, reject) => {
@@ -221,7 +225,6 @@
       };
       req.onsuccess = (e) => { db = e.target.result; resolve(db); };
       req.onerror = (e) => {
-        // 无痕模式检测
         showModal('⚠️ 隐私模式死锁', '当前处于无痕浏览状态，数据将无法持久化保存，为了您的数据安全，请立即切换为标准模式打开系统！');
         reject(e.target.error);
       };
@@ -260,7 +263,7 @@
     });
   }
 
-  // ========== 权限 ==========
+  // ========== 权限与登录 ==========
   const PASS = { staff: 'staff888', boss: 'boss999' };
   let role = null;
   function applyRole() {
@@ -281,7 +284,7 @@
   };
   window.logout = () => { sessionStorage.removeItem('role'); location.reload(); };
 
-  // ========== 自定义模态 ==========
+  // ========== 自定义模态窗 ==========
   function showModal(title, message, type = 'info', onConfirm = null) {
     const content = document.getElementById('customModalContent');
     let actionsHtml = '';
@@ -465,7 +468,7 @@
     pList.innerHTML = allStaff.filter(s=>s.role==='photo').map(build).join('')||'<span class="text-xs text-gray-400">暂无</span>';
   }
 
-  // ========== 轨道渲染 ==========
+  // ========== 轨道渲染（六轨全量） ==========
   function renderTracks() {
     const container = document.getElementById('trackContainer');
     let html = '';
@@ -551,7 +554,7 @@
       </div>`;
     }
 
-    // 技师指派下拉
+    // 技师指派下拉（动态读取运力墙）
     let assignDropdown = '';
     if (track.key==='styling') {
       const makeupStaff = allStaff.filter(s => s.role === 'makeup');
@@ -708,44 +711,73 @@
     refreshDashboard();
   };
 
-  // ========== 渠道对账 ==========
+  // ========== 渠道对账（刚性轧账报表） ==========
   window.openChannelReport = () => {
     const today = new Date().toISOString().split('T')[0];
     const orders = allOrders.filter(o=>o.date===today);
     const payStats = {}, chanStats = {};
+    let totalRevenue = 0, totalExtra = 0, totalDeposit = 0;
     orders.forEach(o => {
       const pm = o.paymentMethod || '未知';
       payStats[pm] = (payStats[pm]||0) + (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0);
       const ch = o.channel||'散客';
       if(!chanStats[ch]) chanStats[ch]={count:0,total:0};
       chanStats[ch].count++; chanStats[ch].total += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0);
+      totalDeposit += (o.deposit||0);
+      totalExtra += (o.extraCost||0);
     });
+    totalRevenue = totalDeposit + totalExtra;
+    const assumedPartTimerCost = 0; // 默认无兼职成本，实际可读取存储的兼职单数
+    const netProfit = totalRevenue - assumedPartTimerCost;
     let payHtml='', chanHtml='';
     for(const [k,v] of Object.entries(payStats)) payHtml+=`<tr><td class="p-1">${k}</td><td class="text-right">¥${v.toLocaleString()}</td></tr>`;
     for(const [k,v] of Object.entries(chanStats)) chanHtml+=`<tr><td class="p-1">${k}</td><td class="text-right">${v.count}单</td><td class="text-right">¥${v.total.toLocaleString()}</td></tr>`;
     const content = document.getElementById('customModalContent');
-    content.innerHTML = `<h3 class="font-bold text-lg mb-3">📋 今日对账报表</h3>
-      <p class="font-semibold text-sm">支付通道实收</p><table class="w-full text-xs">${payHtml||'<tr><td colspan="2">无</td></tr>'}</table>
+    content.innerHTML = `<h3 class="font-bold text-lg mb-3">📋 今日财务轧账报表</h3>
+      <p class="font-semibold text-sm">账单A：支付通道实收单</p><table class="w-full text-xs mb-3">${payHtml||'<tr><td colspan="2">无</td></tr>'}</table>
+      <p class="font-semibold text-sm">账单B：业务成本与纯利润单</p>
+      <div class="text-xs space-y-1 mb-3">
+        <div class="flex justify-between"><span>今日总流水 (定金+加选)</span><span class="font-bold">¥${totalRevenue.toLocaleString()}</span></div>
+        <div class="flex justify-between"><span>今日应付兼职总工费</span><span>¥${assumedPartTimerCost.toLocaleString()}</span></div>
+        <div class="flex justify-between border-t pt-1 mt-1 font-bold text-base"><span>今日门店纯利润</span><span style="color:var(--green);">¥${netProfit.toLocaleString()}</span></div>
+      </div>
       <p class="font-semibold text-sm mt-3">客源渠道统计</p><table class="w-full text-xs">${chanHtml||'<tr><td colspan="3">无</td></tr>'}</table>
       <button class="btn-action btn-green mt-3" onclick="closeModal()">关闭</button>`;
     document.getElementById('customModal').classList.remove('hidden');
   };
 
-  // ========== 呼叫兼职 ==========
+  // ========== 呼叫兼职（工种细分） ==========
   window.openCallModal = () => {
     const content = document.getElementById('customModalContent');
-    content.innerHTML = `<h3 class="font-bold text-lg mb-3">📣 呼叫外部兼职</h3>
-      <div class="space-y-3 text-sm"><div><label>工费</label><input id="basePay" value="200" class="w-full border rounded px-3 py-2"></div>
-      <div><label>风格</label><select id="styleSelect" class="w-full border rounded px-3 py-2">
-        <optgroup label="化妆"><option>傣族重工</option><option>敦煌飞天</option><option>苗族银饰</option><option>大唐古风</option><option>清宫旗头</option><option>西域公主</option><option>战国袍</option><option>现代高奢</option></optgroup>
-        <optgroup label="摄影"><option>暮光夜景</option><option>日系复古</option><option>新中式国潮</option><option>纪实情绪</option><option>法式浪漫</option><option>纪实旅拍</option><option>高级大片</option></optgroup>
-      </select></div>
-      <div class="flex items-center gap-2"><input type="checkbox" id="commToggle" checked> <label>提成</label></div>
-      <div><label>提成%</label><input id="commPercent" value="20" class="w-full border rounded px-3 py-2"></div></div>
+    content.innerHTML = `<h3 class="font-bold text-lg mb-3">📣 呼叫外部兼职 (潮汐客流突发应急)</h3>
+      <div class="space-y-3 text-sm">
+        <div><label class="font-semibold block mb-2">工种细分</label>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2"><input type="radio" name="callRole" value="makeup" checked> 💄 外部化妆师</label>
+            <label class="flex items-center gap-2"><input type="radio" name="callRole" value="photo"> 📷 外部摄影师</label>
+          </div>
+        </div>
+        <div><label>工费</label><input id="basePay" value="200" class="w-full border rounded px-3 py-2"></div>
+        <div><label>风格</label><select id="styleSelect" class="w-full border rounded px-3 py-2">
+          <optgroup label="化妆"><option>傣族重工</option><option>敦煌飞天</option><option>苗族银饰</option><option>大唐古风</option><option>清宫旗头</option><option>西域公主</option><option>战国袍</option><option>现代高奢</option></optgroup>
+          <optgroup label="摄影"><option>暮光夜景</option><option>日系复古</option><option>新中式国潮</option><option>纪实情绪</option><option>法式浪漫</option><option>纪实旅拍</option><option>高级大片</option></optgroup>
+        </select></div>
+        <div class="flex items-center gap-2"><input type="checkbox" id="commToggle" checked> <label>提成</label></div>
+        <div><label>提成%</label><input id="commPercent" value="20" class="w-full border rounded px-3 py-2"></div>
+      </div>
       <div class="flex gap-2 justify-end mt-4"><button class="btn-action" onclick="closeModal()">取消</button><button class="btn-action btn-copper" onclick="confirmCall()">发布</button></div>`;
     document.getElementById('customModal').classList.remove('hidden');
   };
-  window.confirmCall = () => { const bp=document.getElementById('basePay')?.value||'200'; const s=document.getElementById('styleSelect')?.value||''; const c=document.getElementById('commToggle')?.checked; const p=document.getElementById('commPercent')?.value||'20'; closeModal(); showModal('发布成功', `已发布：${s}，工费¥${bp}，${c?`提成${p}%`:''}。提成仅接单后显示。`); };
+  window.confirmCall = () => {
+    const roleEl = document.querySelector('input[name="callRole"]:checked');
+    const role = roleEl ? roleEl.value : 'makeup';
+    const bp=document.getElementById('basePay')?.value||'200';
+    const s=document.getElementById('styleSelect')?.value||'';
+    const c=document.getElementById('commToggle')?.checked;
+    const p=document.getElementById('commPercent')?.value||'20';
+    closeModal();
+    showModal('发布成功', `已发布：${role==='makeup'?'外部化妆师':'外部摄影师'}，${s}风格，工费¥${bp}，${c?`提成${p}%`:''}。提成仅接单后显示。`);
+  };
 
   // ========== 打印 ==========
   window.printOrder = (orderId) => {
@@ -762,7 +794,9 @@
     const backup = { orders, staff, settings, exportDate: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `旅拍派对账备份_${new Date().toISOString().slice(0,10)}.json`; a.click();
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}年${String(now.getMonth()+1).padStart(2,'0')}月${String(now.getDate()).padStart(2,'0')}日`;
+    const a = document.createElement('a'); a.href = url; a.download = `旅拍档期派封账备份_${dateStr}.json`; a.click();
     URL.revokeObjectURL(url);
     showModal('导出成功', '全量封账数据已下载至本地');
   };
