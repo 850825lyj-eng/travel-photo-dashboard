@@ -61,6 +61,15 @@
     @keyframes slideUp { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    /* 抹平数字输入框原生箭头 */
+    input[type="number"].no-spin {
+      -moz-appearance: textfield;
+    }
+    input[type="number"].no-spin::-webkit-outer-spin-button,
+    input[type="number"].no-spin::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
     @media (max-width: 767px) {
       .btn-action { width: 100%; margin-bottom: 4px; }
       .track-body .btn-action { width: auto; }
@@ -88,7 +97,7 @@
   </div>
 </div>
 
-<!-- ==================== 顶部导航（总控枢纽内聚设计） ==================== -->
+<!-- ==================== 顶部导航（总控枢纽） ==================== -->
 <header class="topnav-glass flex items-center justify-between px-4 md:px-6 py-3 flex-shrink-0 gap-4">
   <div class="flex items-center gap-3 flex-shrink-0">
     <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-white font-extrabold text-sm shadow-md" style="background:linear-gradient(135deg,#00C853,#00a844);">派</div>
@@ -105,7 +114,6 @@
       <span class="text-xs text-gray-500 block">今日营业额</span>
       <span class="text-xl md:text-2xl font-extrabold tracking-tight" style="color:var(--green);" id="todayRevenue">¥0</span>
     </div>
-    <!-- 轻奢总控台控制仓 -->
     <div class="flex items-center space-x-1 p-1 bg-slate-50 border border-slate-200/60 rounded-xl">
       <button onclick="openChannelReport()" id="channelBtn" class="px-3 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:text-[#00C853] hover:bg-white transition">渠道</button>
       <button onclick="exportBackup()" class="px-3 py-1.5 rounded-full text-xs font-medium text-gray-600 hover:text-[#00C853] hover:bg-white transition">📥 导出</button>
@@ -120,7 +128,6 @@
 
 <!-- ==================== 主体区域 ==================== -->
 <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
-  <!-- 左侧运力墙 -->
   <aside class="staff-wall lg:w-[14%] lg:min-w-[160px] w-full lg:max-w-[190px] flex-shrink-0 overflow-y-auto lg:overflow-y-auto lg:h-full h-auto max-h-[110px] lg:max-h-full overflow-x-auto lg:overflow-x-hidden p-3 gap-2 flex flex-row lg:flex-col" id="staffWall">
     <div class="flex lg:flex-col gap-2 w-full">
       <div class="text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">💄 化妆师</div>
@@ -141,7 +148,6 @@
     </div>
   </aside>
 
-  <!-- 中部轨道区（六轨等宽平铺） -->
   <main class="flex-1 flex flex-col overflow-hidden">
     <div class="lg:hidden flex gap-1 p-2 overflow-x-auto bg-white/50 backdrop-blur-sm" id="mobileTabs">
       <button class="tab-btn px-3 py-1 rounded-full text-xs font-semibold bg-gray-100" data-track="track1">📋到店</button>
@@ -153,7 +159,6 @@
     </div>
 
     <div id="trackContainer" class="flex-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 h-full gap-3 p-3 md:p-4 bg-[#F8F9FA] overflow-hidden">
-      <!-- 动态渲染轨道 -->
     </div>
   </main>
 </div>
@@ -183,7 +188,7 @@
     <div class="space-y-3">
       <div><label class="font-semibold block mb-1">客户姓名</label><input type="text" id="newOrderName" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')confirmNewOrder()"></div>
       <div><label class="font-semibold block mb-1">联系电话</label><input type="text" id="newOrderPhone" maxlength="11" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')confirmNewOrder()"></div>
-      <div><label class="font-semibold block mb-1">定金金额</label><input type="number" id="newOrderDeposit" value="0" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')confirmNewOrder()"></div>
+      <div><label class="font-semibold block mb-1">定金金额</label><input type="number" id="newOrderDeposit" value="0" class="w-full px-3 py-2 border rounded no-spin" onkeydown="if(event.key==='Enter')confirmNewOrder()"></div>
       <div><label class="font-semibold block mb-1">支付平台</label>
         <select id="newOrderPayment" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')confirmNewOrder()">
           <option value="">未选择</option><option value="微信">微信</option><option value="支付宝">支付宝</option><option value="现金">现金</option><option value="刷卡">刷卡</option>
@@ -208,20 +213,20 @@
 <!-- ==================== 打印区 ==================== -->
 <div id="printArea" style="display:none;"></div>
 
-<!-- ==================== 全量 JavaScript 逻辑 ==================== -->
 <script>
 (() => {
   // ========== IndexedDB 封装 ==========
-  const DB_NAME = 'TravelSchedulerV9';
+  const DB_NAME = 'TravelSchedulerV10';
   let db;
   function openDB() {
     return new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, 1);
+      const req = indexedDB.open(DB_NAME, 2);
       req.onupgradeneeded = (e) => {
         const d = e.target.result;
         if (!d.objectStoreNames.contains('orders')) d.createObjectStore('orders', { keyPath: 'id' });
         if (!d.objectStoreNames.contains('staff')) d.createObjectStore('staff', { keyPath: 'id' });
         if (!d.objectStoreNames.contains('settings')) d.createObjectStore('settings', { keyPath: 'key' });
+        if (!d.objectStoreNames.contains('partTimerCalls')) d.createObjectStore('partTimerCalls', { keyPath: 'id', autoIncrement: true });
       };
       req.onsuccess = (e) => { db = e.target.result; resolve(db); };
       req.onerror = (e) => {
@@ -284,7 +289,7 @@
   };
   window.logout = () => { sessionStorage.removeItem('role'); location.reload(); };
 
-  // ========== 自定义模态窗 ==========
+  // ========== 自定义模态 ==========
   function showModal(title, message, type = 'info', onConfirm = null) {
     const content = document.getElementById('customModalContent');
     let actionsHtml = '';
@@ -468,7 +473,7 @@
     pList.innerHTML = allStaff.filter(s=>s.role==='photo').map(build).join('')||'<span class="text-xs text-gray-400">暂无</span>';
   }
 
-  // ========== 轨道渲染（六轨全量） ==========
+  // ========== 轨道渲染 ==========
   function renderTracks() {
     const container = document.getElementById('trackContainer');
     let html = '';
@@ -491,9 +496,9 @@
           </div>
           <div class="flex items-center gap-1 flex-wrap">
             <span class="font-semibold">单价</span>
-            <label class="text-gray-500 text-xs">标</label><input type="number" value="${settings.priceStandard}" class="w-10 border rounded px-1 py-0.5 text-xs" onchange="updateSetting('priceStandard',this.value)">
-            <label class="text-gray-500 text-xs">超</label><input type="number" value="${settings.pricePremium}" class="w-10 border rounded px-1 py-0.5 text-xs" onchange="updateSetting('pricePremium',this.value)">
-            <label class="text-gray-500 text-xs">商</label><input type="number" value="${settings.priceCommercial}" class="w-10 border rounded px-1 py-0.5 text-xs" onchange="updateSetting('priceCommercial',this.value)">
+            <label class="text-gray-500 text-xs">标</label><input type="number" value="${settings.priceStandard}" class="w-10 border rounded px-1 py-0.5 text-xs no-spin" onchange="updateSetting('priceStandard',this.value)">
+            <label class="text-gray-500 text-xs">超</label><input type="number" value="${settings.pricePremium}" class="w-10 border rounded px-1 py-0.5 text-xs no-spin" onchange="updateSetting('pricePremium',this.value)">
+            <label class="text-gray-500 text-xs">商</label><input type="number" value="${settings.priceCommercial}" class="w-10 border rounded px-1 py-0.5 text-xs no-spin" onchange="updateSetting('priceCommercial',this.value)">
           </div>
         </div>`;
       }
@@ -538,23 +543,23 @@
       rental = !o.rentalDepositPaid ? `<div class="text-xs text-copper mt-1">⚠️押金未登记 <button class="btn-action btn-copper" onclick="event.stopPropagation();openDeposit('${o.id}')">登记</button></div>` : `<div class="text-xs text-green-600 mt-1">✅已收押金¥${o.depositAmount} ${o.rentalReturned?'已还':'未还'} ${!o.rentalReturned?`<button class="btn-action btn-green ml-1" onclick="event.stopPropagation();returnRental('${o.id}')">归还</button>`:''}</div>`;
     }
 
-    // 选片计价器（死锁不换行）
+    // 选片计价器（grid死锁布局，绝不换行）
     let price = '';
     if (track.key==='selection' && settings.selectionMode==='inStore') {
-      price = `<div class="mt-2 flex items-center justify-between flex-nowrap w-full gap-1 text-xs" onclick="event.stopPropagation()">
-        <select onchange="setRetouch('${o.id}',this.value)" class="text-xs border rounded px-1 py-0.5 flex-shrink-0">
+      price = `<div class="mt-2 grid grid-cols-[1fr_auto_auto] items-center gap-1.5 w-full text-xs font-semibold overflow-hidden flex-nowrap" onclick="event.stopPropagation()">
+        <select onchange="setRetouch('${o.id}',this.value)" class="text-xs border rounded px-1 py-0.5 w-full min-w-0">
           <option value="standard" ${o.retouchLevel==='standard'?'selected':''}>标准¥${settings.priceStandard}</option>
           <option value="premium" ${o.retouchLevel==='premium'?'selected':''}>超精¥${settings.pricePremium}</option>
           <option value="commercial" ${o.retouchLevel==='commercial'?'selected':''}>商业¥${settings.priceCommercial}</option>
         </select>
-        <div class="flex items-center gap-1 flex-shrink-0">
-          <button class="qty-btn" onclick="changeExtra('${o.id}',-1)">−</button><span class="mx-1 font-bold">${o.extraPhotos}</span><button class="qty-btn" onclick="changeExtra('${o.id}',1)">+</button>
+        <div class="flex items-center gap-0.5 flex-shrink-0">
+          <button class="qty-btn" onclick="changeExtra('${o.id}',-1)">−</button><span class="mx-1">${o.extraPhotos}</span><button class="qty-btn" onclick="changeExtra('${o.id}',1)">+</button>
         </div>
-        <span class="font-bold flex-shrink-0 whitespace-nowrap" style="color:var(--copper);">+¥${o.extraCost}</span>
+        <span class="whitespace-nowrap shrink-0 font-bold text-rose-500 text-right min-w-[55px]">+¥${o.extraCost}</span>
       </div>`;
     }
 
-    // 技师指派下拉（动态读取运力墙）
+    // 技师指派下拉
     let assignDropdown = '';
     if (track.key==='styling') {
       const makeupStaff = allStaff.filter(s => s.role === 'makeup');
@@ -615,7 +620,7 @@
       <div class="space-y-3 text-sm text-left">
         <div><label class="font-semibold block mb-1">客户姓名</label><input type="text" id="patchName" value="${o.name||''}" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')submitPatchInfo('${orderId}')"></div>
         <div><label class="font-semibold block mb-1">联系电话</label><input type="text" id="patchPhone" value="${o.phone||''}" maxlength="11" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')submitPatchInfo('${orderId}')"></div>
-        <div><label class="font-semibold block mb-1">定金金额</label><input type="number" id="patchDeposit" value="${o.deposit||0}" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')submitPatchInfo('${orderId}')"></div>
+        <div><label class="font-semibold block mb-1">定金金额</label><input type="number" id="patchDeposit" value="${o.deposit||0}" class="w-full px-3 py-2 border rounded no-spin" onkeydown="if(event.key==='Enter')submitPatchInfo('${orderId}')"></div>
         <div><label class="font-semibold block mb-1">支付方式</label>
           <select id="patchPayment" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')submitPatchInfo('${orderId}')">
             <option value="">未选择</option><option value="微信" ${o.paymentMethod==='微信'?'selected':''}>微信</option><option value="支付宝" ${o.paymentMethod==='支付宝'?'selected':''}>支付宝</option><option value="现金" ${o.paymentMethod==='现金'?'selected':''}>现金</option><option value="刷卡" ${o.paymentMethod==='刷卡'?'selected':''}>刷卡</option>
@@ -694,7 +699,7 @@
     const o = allOrders.find(x=>x.id===orderId);
     if (!o) return;
     const content = document.getElementById('customModalContent');
-    content.innerHTML = `<h3 class="font-bold text-lg mb-3">押金登记</h3><input type="number" id="depAmt" class="w-full border rounded px-3 py-2" placeholder="金额" onkeydown="if(event.key==='Enter')confirmDeposit('${orderId}')"><div class="flex gap-2 justify-end mt-3"><button class="btn-action" onclick="closeModal()">取消</button><button class="btn-action btn-copper" onclick="confirmDeposit('${orderId}')">确认</button></div>`;
+    content.innerHTML = `<h3 class="font-bold text-lg mb-3">押金登记</h3><input type="number" id="depAmt" class="w-full border rounded px-3 py-2 no-spin" placeholder="金额" onkeydown="if(event.key==='Enter')confirmDeposit('${orderId}')"><div class="flex gap-2 justify-end mt-3"><button class="btn-action" onclick="closeModal()">取消</button><button class="btn-action btn-copper" onclick="confirmDeposit('${orderId}')">确认</button></div>`;
     document.getElementById('customModal').classList.remove('hidden');
   };
   window.confirmDeposit = async (orderId) => { const o = allOrders.find(x=>x.id===orderId); if(!o) return; const amt = parseFloat(document.getElementById('depAmt').value)||0; o.rentalDepositPaid=true; o.depositAmount=amt; o.totalAmount+=amt; await dbPut('orders',o); closeModal(); refreshDashboard(); };
@@ -712,23 +717,33 @@
   };
 
   // ========== 渠道对账（刚性轧账报表） ==========
-  window.openChannelReport = () => {
+  window.openChannelReport = async () => {
     const today = new Date().toISOString().split('T')[0];
     const orders = allOrders.filter(o=>o.date===today);
     const payStats = {}, chanStats = {};
-    let totalRevenue = 0, totalExtra = 0, totalDeposit = 0;
+    let totalRevenue = 0;
     orders.forEach(o => {
       const pm = o.paymentMethod || '未知';
       payStats[pm] = (payStats[pm]||0) + (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0);
       const ch = o.channel||'散客';
       if(!chanStats[ch]) chanStats[ch]={count:0,total:0};
       chanStats[ch].count++; chanStats[ch].total += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0);
-      totalDeposit += (o.deposit||0);
-      totalExtra += (o.extraCost||0);
+      totalRevenue += (o.deposit||0)+(o.extraCost||0)+(o.depositAmount||0);
     });
-    totalRevenue = totalDeposit + totalExtra;
-    const assumedPartTimerCost = 0; // 默认无兼职成本，实际可读取存储的兼职单数
-    const netProfit = totalRevenue - assumedPartTimerCost;
+    const calls = await dbGetAll('partTimerCalls');
+    const todayCalls = calls.filter(c => c.date === today);
+    let totalPartTimerCost = 0;
+    todayCalls.forEach(c => {
+      totalPartTimerCost += (c.basePay || 0);
+      if (c.role === 'photo' && c.commissionPercent) {
+        const todayExtraTotal = orders.reduce((s,o) => s + (o.extraCost||0), 0);
+        totalPartTimerCost += todayExtraTotal * (c.commissionPercent / 100);
+      }
+      if (c.role === 'makeup' && c.secondaryCommission) {
+        totalPartTimerCost += (c.lashFee||0) + (c.pupilFee||0) + (c.makeupUpgrade||0);
+      }
+    });
+    const netProfit = totalRevenue - totalPartTimerCost;
     let payHtml='', chanHtml='';
     for(const [k,v] of Object.entries(payStats)) payHtml+=`<tr><td class="p-1">${k}</td><td class="text-right">¥${v.toLocaleString()}</td></tr>`;
     for(const [k,v] of Object.entries(chanStats)) chanHtml+=`<tr><td class="p-1">${k}</td><td class="text-right">${v.count}单</td><td class="text-right">¥${v.total.toLocaleString()}</td></tr>`;
@@ -737,8 +752,8 @@
       <p class="font-semibold text-sm">账单A：支付通道实收单</p><table class="w-full text-xs mb-3">${payHtml||'<tr><td colspan="2">无</td></tr>'}</table>
       <p class="font-semibold text-sm">账单B：业务成本与纯利润单</p>
       <div class="text-xs space-y-1 mb-3">
-        <div class="flex justify-between"><span>今日总流水 (定金+加选)</span><span class="font-bold">¥${totalRevenue.toLocaleString()}</span></div>
-        <div class="flex justify-between"><span>今日应付兼职总工费</span><span>¥${assumedPartTimerCost.toLocaleString()}</span></div>
+        <div class="flex justify-between"><span>今日总流水 (定金+加选+押金)</span><span class="font-bold">¥${totalRevenue.toLocaleString()}</span></div>
+        <div class="flex justify-between"><span>今日应付兼职总工费 (${todayCalls.length}单呼叫)</span><span>¥${totalPartTimerCost.toLocaleString()}</span></div>
         <div class="flex justify-between border-t pt-1 mt-1 font-bold text-base"><span>今日门店纯利润</span><span style="color:var(--green);">¥${netProfit.toLocaleString()}</span></div>
       </div>
       <p class="font-semibold text-sm mt-3">客源渠道统计</p><table class="w-full text-xs">${chanHtml||'<tr><td colspan="3">无</td></tr>'}</table>
@@ -746,37 +761,88 @@
     document.getElementById('customModal').classList.remove('hidden');
   };
 
-  // ========== 呼叫兼职（工种细分） ==========
+  // ========== 呼叫兼职（工种细分+动态分成逻辑） ==========
   window.openCallModal = () => {
     const content = document.getElementById('customModalContent');
     content.innerHTML = `<h3 class="font-bold text-lg mb-3">📣 呼叫外部兼职 (潮汐客流突发应急)</h3>
       <div class="space-y-3 text-sm">
         <div><label class="font-semibold block mb-2">工种细分</label>
           <div class="flex gap-4">
-            <label class="flex items-center gap-2"><input type="radio" name="callRole" value="makeup" checked> 💄 外部化妆师</label>
-            <label class="flex items-center gap-2"><input type="radio" name="callRole" value="photo"> 📷 外部摄影师</label>
+            <label class="flex items-center gap-2"><input type="radio" name="callRole" value="makeup" checked onchange="switchCallCommission()"> 💄 外部化妆师</label>
+            <label class="flex items-center gap-2"><input type="radio" name="callRole" value="photo" onchange="switchCallCommission()"> 📷 外部摄影师</label>
           </div>
         </div>
-        <div><label>工费</label><input id="basePay" value="200" class="w-full border rounded px-3 py-2"></div>
+        <div><label>工费</label><input id="basePay" value="200" class="w-full border rounded px-3 py-2 no-spin"></div>
         <div><label>风格</label><select id="styleSelect" class="w-full border rounded px-3 py-2">
           <optgroup label="化妆"><option>傣族重工</option><option>敦煌飞天</option><option>苗族银饰</option><option>大唐古风</option><option>清宫旗头</option><option>西域公主</option><option>战国袍</option><option>现代高奢</option></optgroup>
           <optgroup label="摄影"><option>暮光夜景</option><option>日系复古</option><option>新中式国潮</option><option>纪实情绪</option><option>法式浪漫</option><option>纪实旅拍</option><option>高级大片</option></optgroup>
         </select></div>
-        <div class="flex items-center gap-2"><input type="checkbox" id="commToggle" checked> <label>提成</label></div>
-        <div><label>提成%</label><input id="commPercent" value="20" class="w-full border rounded px-3 py-2"></div>
+        <div id="callCommissionArea">
+          <div id="makeupCommission">
+            <label class="font-semibold block mb-2">化妆师提成模式</label>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2"><input type="radio" name="makeupMode" value="secondary" checked onchange="toggleMakeupMode()"> 💎 存在现场二消产品分成</label>
+              <div id="secondaryItems" class="ml-6 space-y-1">
+                <div><label class="text-xs">睫毛加收金额</label><input id="lashFee" value="0" class="w-full border rounded px-2 py-1 text-xs no-spin"></div>
+                <div><label class="text-xs">美瞳加收金额</label><input id="pupilFee" value="0" class="w-full border rounded px-2 py-1 text-xs no-spin"></div>
+                <div><label class="text-xs">高级彩妆升级费</label><input id="makeupUpgrade" value="0" class="w-full border rounded px-2 py-1 text-xs no-spin"></div>
+              </div>
+              <label class="flex items-center gap-2"><input type="radio" name="makeupMode" value="percent" onchange="toggleMakeupMode()"> 纯提成百分比 / 无二消</label>
+              <div id="makeupPercentArea" class="ml-6 hidden"><div><label class="text-xs">分成百分比 (%)</label><input id="makeupPercent" value="20" class="w-full border rounded px-2 py-1 text-xs no-spin"></div></div>
+            </div>
+          </div>
+          <div id="photoCommission" class="hidden">
+            <label class="font-semibold block mb-1">选片加选金额分成百分比 (%)</label>
+            <input id="photoPercent" value="20" class="w-full border rounded px-3 py-2 no-spin">
+          </div>
+        </div>
       </div>
       <div class="flex gap-2 justify-end mt-4"><button class="btn-action" onclick="closeModal()">取消</button><button class="btn-action btn-copper" onclick="confirmCall()">发布</button></div>`;
     document.getElementById('customModal').classList.remove('hidden');
   };
-  window.confirmCall = () => {
+
+  window.switchCallCommission = () => {
+    const roleEl = document.querySelector('input[name="callRole"]:checked');
+    const makeupDiv = document.getElementById('makeupCommission');
+    const photoDiv = document.getElementById('photoCommission');
+    if (roleEl && roleEl.value === 'makeup') { makeupDiv.classList.remove('hidden'); photoDiv.classList.add('hidden'); }
+    else { makeupDiv.classList.add('hidden'); photoDiv.classList.remove('hidden'); }
+  };
+
+  window.toggleMakeupMode = () => {
+    const modeEl = document.querySelector('input[name="makeupMode"]:checked');
+    const secondaryItems = document.getElementById('secondaryItems');
+    const percentArea = document.getElementById('makeupPercentArea');
+    if (modeEl && modeEl.value === 'secondary') { secondaryItems.classList.remove('hidden'); percentArea.classList.add('hidden'); }
+    else { secondaryItems.classList.add('hidden'); percentArea.classList.remove('hidden'); }
+  };
+
+  window.confirmCall = async () => {
     const roleEl = document.querySelector('input[name="callRole"]:checked');
     const role = roleEl ? roleEl.value : 'makeup';
-    const bp=document.getElementById('basePay')?.value||'200';
-    const s=document.getElementById('styleSelect')?.value||'';
-    const c=document.getElementById('commToggle')?.checked;
-    const p=document.getElementById('commPercent')?.value||'20';
+    const basePay = parseFloat(document.getElementById('basePay')?.value) || 200;
+    const style = document.getElementById('styleSelect')?.value || '';
+    const today = new Date().toISOString().split('T')[0];
+    const callRecord = { role, basePay, style, date: today, timestamp: Date.now() };
+    if (role === 'photo') {
+      callRecord.commissionPercent = parseFloat(document.getElementById('photoPercent')?.value) || 20;
+    } else {
+      const modeEl = document.querySelector('input[name="makeupMode"]:checked');
+      callRecord.makeupMode = modeEl ? modeEl.value : 'secondary';
+      if (callRecord.makeupMode === 'secondary') {
+        callRecord.secondaryCommission = true;
+        callRecord.lashFee = parseFloat(document.getElementById('lashFee')?.value) || 0;
+        callRecord.pupilFee = parseFloat(document.getElementById('pupilFee')?.value) || 0;
+        callRecord.makeupUpgrade = parseFloat(document.getElementById('makeupUpgrade')?.value) || 0;
+      } else {
+        callRecord.secondaryCommission = false;
+        callRecord.commissionPercent = parseFloat(document.getElementById('makeupPercent')?.value) || 20;
+      }
+    }
+    await dbPut('partTimerCalls', callRecord);
     closeModal();
-    showModal('发布成功', `已发布：${role==='makeup'?'外部化妆师':'外部摄影师'}，${s}风格，工费¥${bp}，${c?`提成${p}%`:''}。提成仅接单后显示。`);
+    const roleName = role === 'makeup' ? '外部化妆师' : '外部摄影师';
+    showModal('发布成功', `已发布：${roleName}，${style}风格，工费¥${basePay}。提成规则已锁定，对账时自动结算。`);
   };
 
   // ========== 打印 ==========
@@ -790,8 +856,8 @@
 
   // ========== 备份导入导出 ==========
   window.exportBackup = async () => {
-    const [orders, staff, settings] = await Promise.all([dbGetAll('orders'), dbGetAll('staff'), dbGetAll('settings')]);
-    const backup = { orders, staff, settings, exportDate: new Date().toISOString() };
+    const [orders, staff, sets, calls] = await Promise.all([dbGetAll('orders'), dbGetAll('staff'), dbGetAll('settings'), dbGetAll('partTimerCalls')]);
+    const backup = { orders, staff, settings: sets, partTimerCalls: calls, exportDate: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const now = new Date();
@@ -810,10 +876,11 @@
       try {
         const backup = JSON.parse(text);
         if (!backup.orders || !backup.staff) throw new Error('数据格式无效');
-        await dbClear('orders'); await dbClear('staff'); await dbClear('settings');
+        await dbClear('orders'); await dbClear('staff'); await dbClear('settings'); await dbClear('partTimerCalls');
         for (const o of backup.orders) await dbPut('orders', o);
         for (const s of backup.staff) await dbPut('staff', s);
-        for (const s of backup.settings) await dbPut('settings', s);
+        for (const s of (backup.settings || [])) await dbPut('settings', s);
+        for (const c of (backup.partTimerCalls || [])) await dbPut('partTimerCalls', c);
         showModal('导入成功', '历史备份已一键恢复，正在刷新视图');
         refreshDashboard();
       } catch (err) {
