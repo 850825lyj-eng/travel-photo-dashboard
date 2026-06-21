@@ -7,23 +7,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
-      --bg: #F8F9FA;
-      --card: #FFFFFF;
-      --border: #E2E8F0;
-      --green: #00C853;
-      --yellow: #FFE100;
-      --copper: #D84315;
-      --text: #1a1a2e;
-      --text-secondary: #5a6a7e;
-      --glass: rgba(255, 255, 255, 0.78);
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
-      --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.04);
-      --shadow-lg: 0 12px 32px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.05);
-      --shadow-glow-green: 0 0 20px rgba(0,200,83,0.35), 0 0 6px rgba(0,200,83,0.2);
-      --shadow-glow-yellow: 0 0 22px rgba(255,225,0,0.5), 0 0 8px rgba(255,225,0,0.3);
-      --radius-sm: 10px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
+      --bg: #F8F9FA; --card: #FFFFFF; --border: #E2E8F0; --green: #00C853;
+      --yellow: #FFE100; --copper: #D84315; --text: #1a1a2e;
+      --glass: rgba(255,255,255,0.78); --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.06); --shadow-lg: 0 12px 32px rgba(0,0,0,0.08);
+      --purple: #a855f7;
     }
     * { box-sizing: border-box; }
     body {
@@ -33,26 +21,25 @@
     }
     .topnav-glass {
       background: var(--glass); backdrop-filter: blur(20px) saturate(160%);
-      -webkit-backdrop-filter: blur(20px) saturate(160%);
       border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 100;
     }
     .staff-wall { background: var(--card); border-right: 1px solid var(--border); }
-    .staff-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm); transition: 0.25s; }
-    .staff-card.makeup { border-left: 4px solid #a855f7; } /* 微光紫 */
-    .staff-card.photo { border-left: 4px solid var(--green); } /* 旷野冷绿 */
+    .staff-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; transition: 0.25s; }
+    .staff-card.makeup { border-left: 4px solid var(--purple); }
+    .staff-card.photo { border-left: 4px solid var(--green); }
     .staff-card.overload { border-color: var(--yellow) !important; animation: breathe 0.7s infinite; }
     @keyframes breathe { 0%,100%{box-shadow:0 0 10px rgba(255,225,0,0.3)} 50%{box-shadow:0 0 28px rgba(255,225,0,0.7)} }
     .track-column {
-      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
       box-shadow: var(--shadow-sm); display: flex; flex-direction: column; transition: 0.2s;
     }
     .track-header {
       flex-shrink:0; padding:12px 8px; text-align:center; border-bottom:1px solid var(--border);
-      background: var(--card); border-radius:var(--radius-lg) var(--radius-lg) 0 0; z-index:2;
+      background: var(--card); border-radius:20px 20px 0 0; z-index:2;
     }
     .track-body { flex:1; overflow-y:auto; padding:8px 6px; display:flex; flex-direction:column; gap:7px; scrollbar-width: thin; }
     .order-card {
-      background:#fff; border:1.5px solid var(--border); border-radius:var(--radius-md); padding:10px;
+      background:#fff; border:1.5px solid var(--border); border-radius:14px; padding:10px;
       box-shadow:var(--shadow-sm); transition:0.3s; font-size:13px; cursor:pointer;
     }
     .btn-action {
@@ -67,7 +54,7 @@
       z-index:999; display:flex; align-items:center; justify-content:center; animation:fadeIn 0.2s;
     }
     .modal-box {
-      background:#fff; border-radius:var(--radius-lg); padding:24px; box-shadow:var(--shadow-lg);
+      background:#fff; border-radius:20px; padding:24px; box-shadow:var(--shadow-lg);
       max-width:580px; width:90%; max-height:85vh; overflow-y:auto; animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
     }
     @keyframes fadeIn { from{opacity:0} to{opacity:1} }
@@ -90,7 +77,7 @@
 </head>
 <body class="h-screen flex flex-col">
 
-<!-- ==================== 登录遮罩 ==================== -->
+<!-- 登录遮罩 -->
 <div id="authOverlay" class="fixed inset-0 z-[99999] flex items-center justify-center bg-white/80 backdrop-blur-xl">
   <div class="bg-white rounded-3xl shadow-2xl p-8 w-80 text-center">
     <div class="text-3xl font-bold mb-2" style="color:var(--green);">旅拍档期派</div>
@@ -101,7 +88,7 @@
   </div>
 </div>
 
-<!-- ==================== 顶部导航（总控枢纽） ==================== -->
+<!-- 顶部导航（总控枢纽内聚设计） -->
 <header class="topnav-glass flex items-center justify-between px-4 md:px-6 py-3 flex-shrink-0 gap-4">
   <div class="flex items-center gap-3 flex-shrink-0">
     <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-white font-extrabold text-sm shadow-md" style="background:linear-gradient(135deg,#00C853,#00a844);">派</div>
@@ -110,9 +97,8 @@
       <p class="text-xs text-gray-500 tracking-wide">LIVE SCHEDULING</p>
     </div>
   </div>
-  <button onclick="openCallModal()" class="px-4 py-2 rounded-xl font-bold text-sm flex items-center justify-center shadow-md transition hover:shadow-lg"
-    style="background:#fff; border:2px solid var(--yellow); color:#1a1a2e;">
-    📣 一键呼叫
+  <button onclick="openCallModal()" class="px-4 py-2 rounded-full font-bold text-sm flex items-center justify-center shadow-md transition hover:shadow-lg border-2" style="background:#FFFDE7; border-color:var(--yellow); color:#1a1a2e;">
+    📢 呼叫外部兼职
   </button>
   <div class="flex items-center gap-3 flex-shrink-0">
     <div class="text-right">
@@ -120,15 +106,16 @@
       <span class="text-xl md:text-2xl font-extrabold tracking-tight" style="color:var(--green);" id="todayRevenue">¥0</span>
     </div>
     <button onclick="openChannelReport()" id="channelBtn" class="text-xs text-gray-600 hover:text-gray-900 font-medium transition">渠道</button>
+    <button onclick="exportBackup()" class="text-xs text-gray-500 hover:text-gray-700 font-medium transition">📥 导出</button>
+    <button onclick="importBackup()" class="text-xs text-gray-500 hover:text-gray-700 font-medium transition">📤 导入</button>
     <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-500 font-medium transition">退出</button>
-    <button onclick="openNewOrderModal()" class="px-4 py-2.5 rounded-xl text-white font-bold text-sm flex items-center gap-1 shadow-md hover:shadow-lg transition"
-      style="background:var(--green);">
+    <button onclick="openNewOrderModal()" class="px-4 py-2.5 rounded-xl text-white font-bold text-sm flex items-center gap-1 shadow-md hover:shadow-lg transition" style="background:var(--green);">
       ➕ 新客签到录入
     </button>
   </div>
 </header>
 
-<!-- ==================== 主体区域 ==================== -->
+<!-- 主体区域 -->
 <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
   <!-- 左侧运力墙 -->
   <aside class="staff-wall lg:w-[14%] lg:min-w-[160px] w-full lg:max-w-[190px] flex-shrink-0 overflow-y-auto lg:overflow-y-auto lg:h-full h-auto max-h-[110px] lg:max-h-full overflow-x-auto lg:overflow-x-hidden p-3 gap-2 flex flex-row lg:flex-col" id="staffWall">
@@ -151,7 +138,7 @@
     </div>
   </aside>
 
-  <!-- 中部轨道区（六轨等宽平铺） -->
+  <!-- 中部轨道区 -->
   <main class="flex-1 flex flex-col overflow-hidden">
     <div class="lg:hidden flex gap-1 p-2 overflow-x-auto bg-white/50 backdrop-blur-sm" id="mobileTabs">
       <button class="tab-btn px-3 py-1 rounded-full text-xs font-semibold bg-gray-100" data-track="track1">📋到店</button>
@@ -168,12 +155,12 @@
   </main>
 </div>
 
-<!-- ==================== 自定义模态窗 ==================== -->
+<!-- 自定义模态窗 -->
 <div id="customModal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
   <div class="modal-box text-center" id="customModalContent"></div>
 </div>
 
-<!-- ==================== 添加技师模态窗 ==================== -->
+<!-- 添加技师模态窗 -->
 <div id="addStaffModal" class="modal-overlay hidden" onclick="if(event.target===this)closeAddStaffModal()">
   <div class="modal-box text-center">
     <h3 class="font-bold text-lg mb-4">➕ 添加人员</h3>
@@ -186,7 +173,7 @@
   </div>
 </div>
 
-<!-- ==================== 新客录入模态窗 ==================== -->
+<!-- 新客录入模态窗 -->
 <div id="newOrderModal" class="modal-overlay hidden" onclick="if(event.target===this)closeNewOrderModal()">
   <div class="modal-box text-sm text-left">
     <h3 class="font-bold text-lg mb-4 text-center">➕ 新客签到录入</h3>
@@ -196,22 +183,13 @@
       <div><label class="font-semibold block mb-1">定金金额</label><input type="number" id="newOrderDeposit" value="0" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')confirmNewOrder()"></div>
       <div><label class="font-semibold block mb-1">支付平台</label>
         <select id="newOrderPayment" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')confirmNewOrder()">
-          <option value="">未选择</option>
-          <option value="微信">微信</option>
-          <option value="支付宝">支付宝</option>
-          <option value="现金">现金</option>
-          <option value="刷卡">刷卡</option>
+          <option value="">未选择</option><option value="微信">微信</option><option value="支付宝">支付宝</option><option value="现金">现金</option><option value="刷卡">刷卡</option>
         </select>
       </div>
       <div><label class="font-semibold block mb-1">客源渠道</label>
         <div class="flex gap-2 items-center">
           <select id="newOrderChannelSelect" class="flex-1 px-3 py-2 border rounded" onchange="document.getElementById('newOrderChannelCustom').value=this.value" onkeydown="if(event.key==='Enter')confirmNewOrder()">
-            <option value="">选择渠道</option>
-            <option value="抖音">抖音</option>
-            <option value="小红书">小红书</option>
-            <option value="美团">美团</option>
-            <option value="自进店">自进店</option>
-            <option value="导游带单">导游带单</option>
+            <option value="">选择渠道</option><option value="抖音">抖音</option><option value="小红书">小红书</option><option value="美团">美团</option><option value="自进店">自进店</option><option value="导游带单">导游带单</option>
           </select>
           <input type="text" id="newOrderChannelCustom" placeholder="自定义渠道" class="flex-1 px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')confirmNewOrder()">
         </div>
@@ -224,13 +202,13 @@
   </div>
 </div>
 
-<!-- ==================== 打印区 ==================== -->
+<!-- 打印区 -->
 <div id="printArea" style="display:none;"></div>
 
 <script>
 (() => {
-  // ========== IndexedDB 封装 ==========
-  const DB_NAME = 'TravelSchedulerV7';
+  // ========== IndexedDB ==========
+  const DB_NAME = 'TravelSchedulerV8';
   let db;
   function openDB() {
     return new Promise((resolve, reject) => {
@@ -242,7 +220,11 @@
         if (!d.objectStoreNames.contains('settings')) d.createObjectStore('settings', { keyPath: 'key' });
       };
       req.onsuccess = (e) => { db = e.target.result; resolve(db); };
-      req.onerror = (e) => reject(e.target.error);
+      req.onerror = (e) => {
+        // 无痕模式检测
+        showModal('⚠️ 隐私模式死锁', '当前处于无痕浏览状态，数据将无法持久化保存，为了您的数据安全，请立即切换为标准模式打开系统！');
+        reject(e.target.error);
+      };
     });
   }
   function dbPut(store, data) {
@@ -269,8 +251,16 @@
       tx.onerror = (e) => reject(e.target.error);
     });
   }
+  function dbClear(store) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, 'readwrite');
+      tx.objectStore(store).clear();
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  }
 
-  // ========== 权限与登录 ==========
+  // ========== 权限 ==========
   const PASS = { staff: 'staff888', boss: 'boss999' };
   let role = null;
   function applyRole() {
@@ -353,26 +343,16 @@
     flowCounter++;
     const today = new Date().toISOString().split('T')[0];
     const newOrder = {
-      id: 'order_' + Date.now(),
-      flowNumber: '#' + String(flowCounter).padStart(3, '0'),
-      name, phone, deposit, channel, paymentMethod: payment,
-      type: 'comprehensive',
-      currentTrack: 'track1',
-      timestamp: Date.now(),
-      wechatAdded: false,
-      makeupArtistId: null, photographerId: null,
-      depositAmount: 0, rentalReturned: false,
-      extraPhotos: 0, retouchLevel: 'standard',
-      extraCost: 0, totalAmount: deposit,
+      id: 'order_' + Date.now(), flowNumber: '#' + String(flowCounter).padStart(3, '0'),
+      name, phone, deposit, channel, paymentMethod: payment, type: 'comprehensive',
+      currentTrack: 'track1', timestamp: Date.now(), wechatAdded: false,
+      makeupArtistId: null, photographerId: null, depositAmount: 0, rentalReturned: false,
+      extraPhotos: 0, retouchLevel: 'standard', extraCost: 0, totalAmount: deposit,
       date: today, rentalDepositPaid: false
     };
     await dbPut('orders', newOrder);
     closeNewOrderModal();
     refreshDashboard();
-    setTimeout(() => {
-      const card = document.getElementById('card-' + newOrder.id);
-      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 200);
   };
 
   // ========== 数据模型 ==========
@@ -440,11 +420,9 @@
   }
 
   function renderAll() {
-    renderStaffWall();
-    renderTracks();
+    renderStaffWall(); renderTracks();
     if (role==='boss') updateRevenue();
-    updateTrackBadges();
-    updateMobileTabActive();
+    updateTrackBadges(); updateMobileTabActive();
   }
 
   function updateRevenue() {
@@ -469,7 +447,7 @@
     });
   }
 
-  // ========== 运力墙渲染（双色区分） ==========
+  // ========== 运力墙渲染 ==========
   function renderStaffWall() {
     const mList = document.getElementById('makeupList'), pList = document.getElementById('photoList');
     const build = (s) => {
@@ -487,7 +465,7 @@
     pList.innerHTML = allStaff.filter(s=>s.role==='photo').map(build).join('')||'<span class="text-xs text-gray-400">暂无</span>';
   }
 
-  // ========== 轨道渲染（六轨全量） ==========
+  // ========== 轨道渲染 ==========
   function renderTracks() {
     const container = document.getElementById('trackContainer');
     let html = '';
@@ -557,7 +535,7 @@
       rental = !o.rentalDepositPaid ? `<div class="text-xs text-copper mt-1">⚠️押金未登记 <button class="btn-action btn-copper" onclick="event.stopPropagation();openDeposit('${o.id}')">登记</button></div>` : `<div class="text-xs text-green-600 mt-1">✅已收押金¥${o.depositAmount} ${o.rentalReturned?'已还':'未还'} ${!o.rentalReturned?`<button class="btn-action btn-green ml-1" onclick="event.stopPropagation();returnRental('${o.id}')">归还</button>`:''}</div>`;
     }
 
-    // 选片计价器（flex-nowrap 死锁不换行）
+    // 选片计价器（死锁不换行）
     let price = '';
     if (track.key==='selection' && settings.selectionMode==='inStore') {
       price = `<div class="mt-2 flex items-center justify-between flex-nowrap w-full gap-1 text-xs" onclick="event.stopPropagation()">
@@ -569,11 +547,11 @@
         <div class="flex items-center gap-1 flex-shrink-0">
           <button class="qty-btn" onclick="changeExtra('${o.id}',-1)">−</button><span class="mx-1 font-bold">${o.extraPhotos}</span><button class="qty-btn" onclick="changeExtra('${o.id}',1)">+</button>
         </div>
-        <span class="font-bold flex-shrink-0" style="color:var(--copper);">+¥${o.extraCost}</span>
+        <span class="font-bold flex-shrink-0 whitespace-nowrap" style="color:var(--copper);">+¥${o.extraCost}</span>
       </div>`;
     }
 
-    // 技师指派下拉（动态读取运力墙）
+    // 技师指派下拉
     let assignDropdown = '';
     if (track.key==='styling') {
       const makeupStaff = allStaff.filter(s => s.role === 'makeup');
@@ -637,12 +615,16 @@
         <div><label class="font-semibold block mb-1">定金金额</label><input type="number" id="patchDeposit" value="${o.deposit||0}" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')submitPatchInfo('${orderId}')"></div>
         <div><label class="font-semibold block mb-1">支付方式</label>
           <select id="patchPayment" class="w-full px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')submitPatchInfo('${orderId}')">
-            <option value="">未选择</option>
-            <option value="微信" ${o.paymentMethod==='微信'?'selected':''}>微信</option>
-            <option value="支付宝" ${o.paymentMethod==='支付宝'?'selected':''}>支付宝</option>
-            <option value="现金" ${o.paymentMethod==='现金'?'selected':''}>现金</option>
-            <option value="刷卡" ${o.paymentMethod==='刷卡'?'selected':''}>刷卡</option>
+            <option value="">未选择</option><option value="微信" ${o.paymentMethod==='微信'?'selected':''}>微信</option><option value="支付宝" ${o.paymentMethod==='支付宝'?'selected':''}>支付宝</option><option value="现金" ${o.paymentMethod==='现金'?'selected':''}>现金</option><option value="刷卡" ${o.paymentMethod==='刷卡'?'selected':''}>刷卡</option>
           </select>
+        </div>
+        <div><label class="font-semibold block mb-1">客源渠道</label>
+          <div class="flex gap-2 items-center">
+            <select id="patchChannelSelect" class="flex-1 px-3 py-2 border rounded" onchange="document.getElementById('patchChannelCustom').value=this.value" onkeydown="if(event.key==='Enter')submitPatchInfo('${orderId}')">
+              <option value="">选择渠道</option><option value="抖音" ${o.channel==='抖音'?'selected':''}>抖音</option><option value="小红书" ${o.channel==='小红书'?'selected':''}>小红书</option><option value="美团" ${o.channel==='美团'?'selected':''}>美团</option><option value="自进店" ${o.channel==='自进店'?'selected':''}>自进店</option><option value="导游带单" ${o.channel==='导游带单'?'selected':''}>导游带单</option>
+            </select>
+            <input type="text" id="patchChannelCustom" value="${o.channel||''}" class="flex-1 px-3 py-2 border rounded" onkeydown="if(event.key==='Enter')submitPatchInfo('${orderId}')">
+          </div>
         </div>
       </div>
       <div class="flex justify-end gap-2 mt-4">
@@ -660,17 +642,18 @@
     const phone = document.getElementById('patchPhone').value.trim();
     const deposit = parseFloat(document.getElementById('patchDeposit').value) || 0;
     const payment = document.getElementById('patchPayment').value;
-    o.name = name || '匿名散客';
-    o.phone = phone;
-    o.deposit = deposit;
-    o.paymentMethod = payment || null;
+    let channel = document.getElementById('patchChannelCustom').value.trim();
+    if (!channel) channel = document.getElementById('patchChannelSelect').value;
+    if (!channel) channel = '散客';
+    o.name = name || '匿名散客'; o.phone = phone; o.deposit = deposit;
+    o.paymentMethod = payment || null; o.channel = channel;
     o.totalAmount = deposit + (o.extraCost||0) + (o.depositAmount||0);
     await dbPut('orders', o);
     closeModal();
     refreshDashboard();
   };
 
-  // ========== 流转与指派 ==========
+  // ========== 业务流程 ==========
   window.moveToNext = async (orderId) => {
     const o = allOrders.find(x=>x.id===orderId);
     if (!o) return;
@@ -678,13 +661,10 @@
     if (!nextId) return;
     if (o.currentTrack==='track1' && !o.paymentMethod) { showModal('支付未对账','请先选择支付方式'); return; }
     if (!o.name || o.name==='匿名散客' || !o.phone) { showModal('信息不全','请补全客户姓名和电话'); return; }
-    // 离开轨道时释放技师
     if (o.currentTrack==='track3') o.makeupArtistId = null;
     if (o.currentTrack==='track4') o.photographerId = null;
-    o.currentTrack = nextId;
-    o.timestamp = Date.now();
-    await dbPut('orders', o);
-    refreshDashboard();
+    o.currentTrack = nextId; o.timestamp = Date.now();
+    await dbPut('orders', o); refreshDashboard();
   };
 
   window.assignStaff = async (orderId, roleType, staffId) => {
@@ -692,14 +672,13 @@
     if (!o || !staffId) return;
     if (roleType === 'makeup') o.makeupArtistId = staffId;
     else if (roleType === 'photo') o.photographerId = staffId;
-    await dbPut('orders', o);
-    refreshDashboard();
+    await dbPut('orders', o); refreshDashboard();
   };
 
   window.toggleLeaveConfirm = (staffId) => {
     const s = allStaff.find(x=>x.id===staffId);
     if (!s) return;
-    if (s.currentLoad > 0) { showModal('无法下班','该人员仍在服务中'); return; }
+    if (s.currentLoad > 0) { showModal('无法下班','该人员仍在服务中，请先完成手头订单'); return; }
     showModal('确认下班', `确定让 ${s.name} 下班并移除？`, 'confirm', async () => {
       allStaff = allStaff.filter(x=>x.id!==staffId);
       await dbDelete('staff', staffId);
@@ -715,15 +694,7 @@
     content.innerHTML = `<h3 class="font-bold text-lg mb-3">押金登记</h3><input type="number" id="depAmt" class="w-full border rounded px-3 py-2" placeholder="金额" onkeydown="if(event.key==='Enter')confirmDeposit('${orderId}')"><div class="flex gap-2 justify-end mt-3"><button class="btn-action" onclick="closeModal()">取消</button><button class="btn-action btn-copper" onclick="confirmDeposit('${orderId}')">确认</button></div>`;
     document.getElementById('customModal').classList.remove('hidden');
   };
-  window.confirmDeposit = async (orderId) => {
-    const o = allOrders.find(x=>x.id===orderId);
-    if (!o) return;
-    const amt = parseFloat(document.getElementById('depAmt').value)||0;
-    o.rentalDepositPaid=true; o.depositAmount=amt; o.totalAmount+=amt;
-    await dbPut('orders',o);
-    closeModal();
-    refreshDashboard();
-  };
+  window.confirmDeposit = async (orderId) => { const o = allOrders.find(x=>x.id===orderId); if(!o) return; const amt = parseFloat(document.getElementById('depAmt').value)||0; o.rentalDepositPaid=true; o.depositAmount=amt; o.totalAmount+=amt; await dbPut('orders',o); closeModal(); refreshDashboard(); };
   window.returnRental = async (orderId) => { const o = allOrders.find(x=>x.id===orderId); if(o){ o.rentalReturned=true; await dbPut('orders',o); refreshDashboard(); } };
   window.setRetouch = async (orderId, level) => { const o = allOrders.find(x=>x.id===orderId); if(o){ o.retouchLevel=level; calcExtra(o); await dbPut('orders',o); refreshDashboard(); } };
   window.changeExtra = async (orderId, delta) => { const o = allOrders.find(x=>x.id===orderId); if(o){ o.extraPhotos=Math.max(0,(o.extraPhotos||0)+delta); calcExtra(o); await dbPut('orders',o); refreshDashboard(); } };
@@ -737,6 +708,7 @@
     refreshDashboard();
   };
 
+  // ========== 渠道对账 ==========
   window.openChannelReport = () => {
     const today = new Date().toISOString().split('T')[0];
     const orders = allOrders.filter(o=>o.date===today);
@@ -752,13 +724,14 @@
     for(const [k,v] of Object.entries(payStats)) payHtml+=`<tr><td class="p-1">${k}</td><td class="text-right">¥${v.toLocaleString()}</td></tr>`;
     for(const [k,v] of Object.entries(chanStats)) chanHtml+=`<tr><td class="p-1">${k}</td><td class="text-right">${v.count}单</td><td class="text-right">¥${v.total.toLocaleString()}</td></tr>`;
     const content = document.getElementById('customModalContent');
-    content.innerHTML = `<h3 class="font-bold text-lg mb-3">📋 今日对账</h3>
+    content.innerHTML = `<h3 class="font-bold text-lg mb-3">📋 今日对账报表</h3>
       <p class="font-semibold text-sm">支付通道实收</p><table class="w-full text-xs">${payHtml||'<tr><td colspan="2">无</td></tr>'}</table>
       <p class="font-semibold text-sm mt-3">客源渠道统计</p><table class="w-full text-xs">${chanHtml||'<tr><td colspan="3">无</td></tr>'}</table>
       <button class="btn-action btn-green mt-3" onclick="closeModal()">关闭</button>`;
     document.getElementById('customModal').classList.remove('hidden');
   };
 
+  // ========== 呼叫兼职 ==========
   window.openCallModal = () => {
     const content = document.getElementById('customModalContent');
     content.innerHTML = `<h3 class="font-bold text-lg mb-3">📣 呼叫外部兼职</h3>
@@ -772,21 +745,48 @@
       <div class="flex gap-2 justify-end mt-4"><button class="btn-action" onclick="closeModal()">取消</button><button class="btn-action btn-copper" onclick="confirmCall()">发布</button></div>`;
     document.getElementById('customModal').classList.remove('hidden');
   };
-  window.confirmCall = () => {
-    const basePay = document.getElementById('basePay')?.value || '200';
-    const style = document.getElementById('styleSelect')?.value || '';
-    const comm = document.getElementById('commToggle')?.checked;
-    const per = document.getElementById('commPercent')?.value || '20';
-    closeModal();
-    showModal('发布成功', `已发布：${style}，工费¥${basePay}，${comm?`提成${per}%`:''}。提成仅接单后显示。`);
-  };
+  window.confirmCall = () => { const bp=document.getElementById('basePay')?.value||'200'; const s=document.getElementById('styleSelect')?.value||''; const c=document.getElementById('commToggle')?.checked; const p=document.getElementById('commPercent')?.value||'20'; closeModal(); showModal('发布成功', `已发布：${s}，工费¥${bp}，${c?`提成${p}%`:''}。提成仅接单后显示。`); };
 
+  // ========== 打印 ==========
   window.printOrder = (orderId) => {
     const o = allOrders.find(x=>x.id===orderId); if(!o) return;
     const level = {standard:'标准精修',premium:'超精修',commercial:'商业精修'};
     document.getElementById('printArea').innerHTML = `<div style="font-family:'PingFang SC','Microsoft YaHei',sans-serif;"><h3 style="text-align:center;border-bottom:2px solid #000;">旅拍档期派 · 双联单据</h3><table class="print-table"><tr><td><b>流水号</b></td><td>${o.flowNumber}</td><td><b>渠道</b></td><td>${o.channel}</td></tr><tr><td><b>客户</b></td><td>${o.name}</td><td><b>电话</b></td><td>${o.phone}</td></tr><tr><td><b>精修</b></td><td>${level[o.retouchLevel]}</td><td><b>加选</b></td><td>${o.extraPhotos}张</td></tr><tr><td><b>加选费</b></td><td>¥${o.extraCost}</td><td><b>押金</b></td><td>¥${o.depositAmount||0}</td></tr><tr><td><b>总金额</b></td><td>¥${o.totalAmount}</td><td><b>状态</b></td><td>${o.currentTrack==='track6'?'已结算':'进行中'}</td></tr></table><div style="margin-top:12px;display:flex;justify-content:space-between;"><span>选片师：________</span><span>客户：________</span></div></div>`;
     document.getElementById('printArea').style.display = 'block';
     setTimeout(() => { window.print(); setTimeout(() => document.getElementById('printArea').style.display = 'none', 500); }, 200);
+  };
+
+  // ========== 备份导入导出 ==========
+  window.exportBackup = async () => {
+    const [orders, staff, settings] = await Promise.all([dbGetAll('orders'), dbGetAll('staff'), dbGetAll('settings')]);
+    const backup = { orders, staff, settings, exportDate: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `旅拍派对账备份_${new Date().toISOString().slice(0,10)}.json`; a.click();
+    URL.revokeObjectURL(url);
+    showModal('导出成功', '全量封账数据已下载至本地');
+  };
+
+  window.importBackup = () => {
+    const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const text = await file.text();
+      try {
+        const backup = JSON.parse(text);
+        if (!backup.orders || !backup.staff) throw new Error('数据格式无效');
+        await dbClear('orders'); await dbClear('staff'); await dbClear('settings');
+        for (const o of backup.orders) await dbPut('orders', o);
+        for (const s of backup.staff) await dbPut('staff', s);
+        for (const s of backup.settings) await dbPut('settings', s);
+        showModal('导入成功', '历史备份已一键恢复，正在刷新视图');
+        refreshDashboard();
+      } catch (err) {
+        showModal('导入失败', '文件格式不正确或数据已损坏');
+      }
+    };
+    input.click();
   };
 
   // 手机标签切换
